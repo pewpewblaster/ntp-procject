@@ -567,6 +567,29 @@
       <string>Warehouse country</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="push_button_select_warehouse">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>180</y>
+       <width>151</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Select warehouse</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="line_edit_select_warehouse">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>150</y>
+       <width>151</width>
+       <height>20</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">

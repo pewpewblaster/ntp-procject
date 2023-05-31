@@ -7,7 +7,7 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from access_connector import import_product
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -15,39 +15,27 @@ class Ui_MainWindow(object):
         MainWindow.resize(772, 677)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-
-        # table widget
         self.table_proizvodi = QtWidgets.QTableWidget(parent=self.centralwidget)
         self.table_proizvodi.setGeometry(QtCore.QRect(30, 410, 691, 201))
         self.table_proizvodi.setObjectName("table_proizvodi")
         self.table_proizvodi.setColumnCount(0)
         self.table_proizvodi.setRowCount(0)
-
-        # vertical slider next to the table widget
         self.vertical_slider_proizvodi = QtWidgets.QSlider(parent=self.centralwidget)
         self.vertical_slider_proizvodi.setGeometry(QtCore.QRect(730, 370, 22, 241))
         self.vertical_slider_proizvodi.setOrientation(QtCore.Qt.Orientation.Vertical)
         self.vertical_slider_proizvodi.setObjectName("vertical_slider_proizvodi")
-
-        # group box widget - Information
         self.group_box_information = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_information.setGeometry(QtCore.QRect(10, 10, 311, 71))
         self.group_box_information.setObjectName("group_box_information")
-
-        # label language
         self.label_active_language_show = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_language_show.setGeometry(QtCore.QRect(80, 40, 47, 21))
         self.label_active_language_show.setObjectName("label_active_language_show")
-
-        #
         self.label_active_user = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_user.setGeometry(QtCore.QRect(10, 20, 61, 21))
         self.label_active_user.setObjectName("label_active_user")
         self.label_active_user_show = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_user_show.setGeometry(QtCore.QRect(80, 20, 47, 21))
         self.label_active_user_show.setObjectName("label_active_user_show")
-
-        # 
         self.label_active_language = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_language.setGeometry(QtCore.QRect(10, 40, 61, 21))
         self.label_active_language.setObjectName("label_active_language")
@@ -63,17 +51,15 @@ class Ui_MainWindow(object):
         self.label_time = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_time.setGeometry(QtCore.QRect(180, 40, 31, 21))
         self.label_time.setObjectName("label_time")
-        
-        # groupbox proizvodi
         self.group_box_product = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_product.setGeometry(QtCore.QRect(520, 100, 231, 241))
         self.group_box_product.setObjectName("group_box_product")
-
-        
+        self.button_save_product = QtWidgets.QPushButton(parent=self.group_box_product)
+        self.button_save_product.setGeometry(QtCore.QRect(100, 200, 111, 23))
+        self.button_save_product.setObjectName("button_save_product")
         self.line_edit_products_name = QtWidgets.QLineEdit(parent=self.group_box_product)
         self.line_edit_products_name.setGeometry(QtCore.QRect(100, 70, 111, 20))
         self.line_edit_products_name.setObjectName("line_edit_products_name")
-        self.line_edit_products_name.setText("test")
         self.line_edit_products_price = QtWidgets.QLineEdit(parent=self.group_box_product)
         self.line_edit_products_price.setGeometry(QtCore.QRect(100, 100, 111, 20))
         self.line_edit_products_price.setObjectName("line_edit_products_price")
@@ -105,13 +91,6 @@ class Ui_MainWindow(object):
         self.line_edit_products_category = QtWidgets.QLineEdit(parent=self.group_box_product)
         self.line_edit_products_category.setGeometry(QtCore.QRect(100, 160, 111, 20))
         self.line_edit_products_category.setObjectName("line_edit_products_category")
-        
-        self.button_save_product = QtWidgets.QPushButton(parent=self.group_box_product)
-        self.button_save_product.setGeometry(QtCore.QRect(100, 200, 111, 23))
-        self.button_save_product.setObjectName("button_save_product")
-        self.button_save_product.clicked.connect(self.add_to_database)
-        
-        
         self.group_box_warehouse = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_warehouse.setGeometry(QtCore.QRect(240, 100, 261, 241))
         self.group_box_warehouse.setObjectName("group_box_warehouse")
@@ -175,6 +154,12 @@ class Ui_MainWindow(object):
         self.label_warehouse_information_country = QtWidgets.QLabel(parent=self.group_box_selected_warehouse)
         self.label_warehouse_information_country.setGeometry(QtCore.QRect(20, 120, 111, 16))
         self.label_warehouse_information_country.setObjectName("label_warehouse_information_country")
+        self.push_button_select_warehouse = QtWidgets.QPushButton(parent=self.group_box_selected_warehouse)
+        self.push_button_select_warehouse.setGeometry(QtCore.QRect(20, 180, 151, 23))
+        self.push_button_select_warehouse.setObjectName("push_button_select_warehouse")
+        self.line_edit_select_warehouse = QtWidgets.QLineEdit(parent=self.group_box_selected_warehouse)
+        self.line_edit_select_warehouse.setGeometry(QtCore.QRect(20, 150, 151, 20))
+        self.line_edit_select_warehouse.setObjectName("line_edit_select_warehouse")
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(30, 340, 47, 13))
         self.label.setText("")
@@ -183,7 +168,7 @@ class Ui_MainWindow(object):
         self.label_category_filter.setGeometry(QtCore.QRect(40, 346, 111, 20))
         self.label_category_filter.setObjectName("label_category_filter")
         self.combo_box_category_filter = QtWidgets.QComboBox(parent=self.centralwidget)
-        self.combo_box_category_filter.setGeometry(QtCore.QRect(40, 370, 200, 22))
+        self.combo_box_category_filter.setGeometry(QtCore.QRect(40, 370, 111, 22))
         self.combo_box_category_filter.setObjectName("combo_box_category_filter")
         self.combo_box_category_filter.addItem("")
         self.combo_box_category_filter.addItem("")
@@ -202,24 +187,9 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionQuit = QtGui.QAction(parent=MainWindow)
         self.actionQuit.setObjectName("actionQuit")
-        
-        self.line_edit_select_warehouse = QtWidgets.QLineEdit(parent=self.group_box_selected_warehouse)
-        self.line_edit_select_warehouse.setGeometry(QtCore.QRect(20, 150, 151, 20))
-        self.line_edit_select_warehouse.setObjectName("line_edit_select_warehouse")
-        self.push_button_select_warehouse = QtWidgets.QPushButton(parent=self.group_box_selected_warehouse)
-        self.push_button_select_warehouse.setGeometry(QtCore.QRect(20, 180, 151, 23))
-        self.push_button_select_warehouse.setObjectName("push_button_select_warehouse")
-
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-    def add_to_database(self):
-        import_product(self.line_edit_products_warehouse_id.text(),
-                        self.line_edit_products_name.text(),
-                        self.line_edit_products_price.text(),
-                        self.line_edit_products_quantity.text(),
-                        self.line_edit_products_category.text())
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -257,11 +227,11 @@ class Ui_MainWindow(object):
         self.label_warehouse_information_street.setText(_translate("MainWindow", "Warehouse street"))
         self.label_warehouse_information_country_show.setText(_translate("MainWindow", "None"))
         self.label_warehouse_information_country.setText(_translate("MainWindow", "Warehouse country"))
+        self.push_button_select_warehouse.setText(_translate("MainWindow", "Select warehouse"))
         self.label_category_filter.setText(_translate("MainWindow", "Category filter"))
         self.combo_box_category_filter.setItemText(0, _translate("MainWindow", "Hrana"))
         self.combo_box_category_filter.setItemText(1, _translate("MainWindow", "Odjeca i obuca"))
         self.combo_box_category_filter.setItemText(2, _translate("MainWindow", "Tehnika i elektronika"))
         self.combo_box_category_filter.setItemText(3, _translate("MainWindow", "Kucanski aparati"))
         self.combo_box_category_filter.setItemText(4, _translate("MainWindow", "Kozmetika i osobna njega"))
-        self.push_button_select_warehouse.setText(_translate("MainWindow", "Select warehouse"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
