@@ -7,7 +7,7 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-
+from access_connector import import_product
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -63,15 +63,17 @@ class Ui_MainWindow(object):
         self.label_time = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_time.setGeometry(QtCore.QRect(180, 40, 31, 21))
         self.label_time.setObjectName("label_time")
+        
+        # groupbox proizvodi
         self.group_box_product = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_product.setGeometry(QtCore.QRect(520, 100, 231, 241))
         self.group_box_product.setObjectName("group_box_product")
-        self.button_save_product = QtWidgets.QPushButton(parent=self.group_box_product)
-        self.button_save_product.setGeometry(QtCore.QRect(100, 200, 111, 23))
-        self.button_save_product.setObjectName("button_save_product")
+
+        
         self.line_edit_products_name = QtWidgets.QLineEdit(parent=self.group_box_product)
         self.line_edit_products_name.setGeometry(QtCore.QRect(100, 70, 111, 20))
         self.line_edit_products_name.setObjectName("line_edit_products_name")
+        self.line_edit_products_name.setText("test")
         self.line_edit_products_price = QtWidgets.QLineEdit(parent=self.group_box_product)
         self.line_edit_products_price.setGeometry(QtCore.QRect(100, 100, 111, 20))
         self.line_edit_products_price.setObjectName("line_edit_products_price")
@@ -103,6 +105,13 @@ class Ui_MainWindow(object):
         self.line_edit_products_category = QtWidgets.QLineEdit(parent=self.group_box_product)
         self.line_edit_products_category.setGeometry(QtCore.QRect(100, 160, 111, 20))
         self.line_edit_products_category.setObjectName("line_edit_products_category")
+        
+        self.button_save_product = QtWidgets.QPushButton(parent=self.group_box_product)
+        self.button_save_product.setGeometry(QtCore.QRect(100, 200, 111, 23))
+        self.button_save_product.setObjectName("button_save_product")
+        self.button_save_product.clicked.connect(self.add_to_database)
+        
+        
         self.group_box_warehouse = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_warehouse.setGeometry(QtCore.QRect(240, 100, 261, 241))
         self.group_box_warehouse.setObjectName("group_box_warehouse")
@@ -196,6 +205,13 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    def add_to_database(self):
+        import_product(self.line_edit_products_warehouse_id.text(),
+                                                                self.line_edit_products_name.text(),
+                                                                self.line_edit_products_price.text(),
+                                                                self.line_edit_products_quantity.text(),
+                                                                self.line_edit_products_category.text())
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate

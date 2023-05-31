@@ -35,6 +35,7 @@ def check_credentials(username, password):
         print("Credentials not found in the database.")
         return False
 
+# funkcija za kreiranje novog usera na formi create_user_form.py
 def create_new_user(username, password):
     connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/users.accdb;'
     database_users = pyodbc.connect(connection_string)
@@ -57,7 +58,28 @@ def create_new_user(username, password):
         print("Username and password saved to the database.")
         return True
 
+def import_product(warehouse_id,
+                    product_name,
+                    product_price,
+                    product_quantity,
+                    product_category):
 
+    if warehouse_id and product_name and product_price and product_quantity and product_category:
+        connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;'
+        database_skladiste = pyodbc.connect(connection_string)
+        cursor = database_skladiste.cursor()
+
+        insert_query = 'INSERT INTO proizvodi (skladiste_id, naziv, cijena, kolicina, kategorija) ' \
+                        'VALUES (?, ?, ?, ?, ?)'
+        cursor.execute(insert_query, warehouse_id, product_name, product_price, product_quantity, product_category)
+        database_skladiste.commit()
+
+        cursor.close()
+        database_skladiste.close()
+
+        # Optionally, you can update the table after importing the product
+
+        print("Product imported successfully.")
 
  
     
