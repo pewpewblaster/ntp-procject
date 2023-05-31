@@ -146,6 +146,19 @@
     <string>TextLabel</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="push_button_new_user">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>190</y>
+     <width>191</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Create new user</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

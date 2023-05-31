@@ -26,7 +26,7 @@ if __name__ == '__main__':
     settings(window, config)
 
     window.setGeometry(100, 100, 250, 300)
-    
+
     login_window = login_form()
     login_window.login_ui(window)
     window.show()

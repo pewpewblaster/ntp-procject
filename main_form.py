@@ -15,27 +15,39 @@ class Ui_MainWindow(object):
         MainWindow.resize(772, 677)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
+        # table widget
         self.table_proizvodi = QtWidgets.QTableWidget(parent=self.centralwidget)
         self.table_proizvodi.setGeometry(QtCore.QRect(30, 410, 691, 201))
         self.table_proizvodi.setObjectName("table_proizvodi")
         self.table_proizvodi.setColumnCount(0)
         self.table_proizvodi.setRowCount(0)
+
+        # vertical slider next to the table widget
         self.vertical_slider_proizvodi = QtWidgets.QSlider(parent=self.centralwidget)
         self.vertical_slider_proizvodi.setGeometry(QtCore.QRect(730, 370, 22, 241))
         self.vertical_slider_proizvodi.setOrientation(QtCore.Qt.Orientation.Vertical)
         self.vertical_slider_proizvodi.setObjectName("vertical_slider_proizvodi")
+
+        # group box widget - Information
         self.group_box_information = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_information.setGeometry(QtCore.QRect(10, 10, 311, 71))
         self.group_box_information.setObjectName("group_box_information")
+
+        # label language
         self.label_active_language_show = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_language_show.setGeometry(QtCore.QRect(80, 40, 47, 21))
         self.label_active_language_show.setObjectName("label_active_language_show")
+
+        #
         self.label_active_user = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_user.setGeometry(QtCore.QRect(10, 20, 61, 21))
         self.label_active_user.setObjectName("label_active_user")
         self.label_active_user_show = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_user_show.setGeometry(QtCore.QRect(80, 20, 47, 21))
         self.label_active_user_show.setObjectName("label_active_user_show")
+
+        # 
         self.label_active_language = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_language.setGeometry(QtCore.QRect(10, 40, 61, 21))
         self.label_active_language.setObjectName("label_active_language")
