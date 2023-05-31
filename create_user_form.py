@@ -7,18 +7,23 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-
+from access_connector import create_new_user
 
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(320, 321)
+        self.Form = Form
+        
         self.group_box_create_user = QtWidgets.QGroupBox(parent=Form)
         self.group_box_create_user.setGeometry(QtCore.QRect(20, 20, 281, 271))
         self.group_box_create_user.setObjectName("group_box_create_user")
+        
         self.button_create = QtWidgets.QPushButton(parent=self.group_box_create_user)
         self.button_create.setGeometry(QtCore.QRect(20, 130, 111, 24))
         self.button_create.setObjectName("button_create")
+        self.button_create.clicked.connect(self.create_new_user)
+
         self.button_exit = QtWidgets.QPushButton(parent=self.group_box_create_user)
         self.button_exit.setGeometry(QtCore.QRect(144, 130, 111, 24))
         self.button_exit.setObjectName("button_exit")
@@ -41,9 +46,17 @@ class Ui_Form(object):
         self.label_information.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeading|QtCore.Qt.AlignmentFlag.AlignLeft|QtCore.Qt.AlignmentFlag.AlignTop)
         self.label_information.setWordWrap(True)
         self.label_information.setObjectName("label_information")
-
+        
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
+        
+        
+    def create_new_user(self, Form):
+        if create_new_user(self.line_edit_username.text(), self.line_edit_password.text()):
+            QtWidgets.QMessageBox.warning(self.Form, "Success", "User created.")
+        else:
+            QtWidgets.QMessageBox.warning(self.Form, "Error", "User already exists!")
+           
 
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
@@ -53,4 +66,4 @@ class Ui_Form(object):
         self.button_exit.setText(_translate("Form", "Exit"))
         self.label_username.setText(_translate("Form", "Username"))
         self.label_password.setText(_translate("Form", "Password"))
-        self.label_information.setText(_translate("Form", "none"))
+        self.label_information.setText(_translate("Form", ""))

@@ -1,6 +1,7 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from access_connector import check_credentials
 from main_form import Ui_MainWindow
+from create_user_form import Ui_Form
 
 class login_form(object):
     def login_ui(self, Form):
@@ -68,13 +69,16 @@ class login_form(object):
         self.push_button_new_user = QtWidgets.QPushButton(parent=Form)
         self.push_button_new_user.setGeometry(QtCore.QRect(20, 240, 191, 24))
         self.push_button_new_user.setObjectName("push_button_new_user")
-        self.push_button_new_user.clicked.connect(self.login)
+        self.push_button_new_user.clicked.connect(self.open_create_user_form)
 
         self.language_select(Form, self.comboBox.currentText())
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def open_create_user_form(self):
-        pass
+        self.main_window = QtWidgets.QMainWindow()
+        self.create_user = Ui_Form()
+        self.create_user.setupUi(self.main_window)
+        self.main_window.show()
         
 
     def login(self):

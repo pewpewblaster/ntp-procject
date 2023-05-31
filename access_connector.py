@@ -35,7 +35,29 @@ def check_credentials(username, password):
         print("Credentials not found in the database.")
         return False
 
+def create_new_user(username, password):
+    connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/users.accdb;'
+    database_users = pyodbc.connect(connection_string)
 
-### databaza kupci
+    query = database_users.cursor()
+    query.execute("SELECT username FROM credentials WHERE username=?", username)
+    user = query.fetchone()
+
+    
+    if user is not None:
+        print("Username already exists in the database.")
+        query.close()
+        database_users.close()
+        return False
+    else:
+        query.execute("INSERT INTO credentials (username, password) VALUES (?, ?)", username, password)
+        database_users.commit()
+        query.close()
+        database_users.close()
+        print("Username and password saved to the database.")
+        return True
+
+
+
  
     
