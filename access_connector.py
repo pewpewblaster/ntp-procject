@@ -78,6 +78,27 @@ def import_product(warehouse_id,
         database_skladiste.close()
 
         print("Product imported successfully.")
+        
+def import_warehouse(
+                    warehouse_name,
+                    warehouse_address,
+                    warehouse_city,
+                    warehouse_country):
+
+    if warehouse_name and warehouse_address and warehouse_city and warehouse_country:
+        database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+        query = database_skladiste.cursor()
+
+        insert_query = 'INSERT INTO skladista (naziv_skladista, adresa, grad, drzava) ' \
+                        'VALUES (?, ?, ?, ?)'
+        query.execute(insert_query, warehouse_name, warehouse_address, warehouse_city, warehouse_country)
+        database_skladiste.commit()
+
+        query.close()
+        database_skladiste.close()
+
+        print("Warehouse imported successfully.")
+
 
 def get_table(warehouse_id):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
@@ -99,3 +120,5 @@ def get_table(warehouse_id):
     database_skladiste.close()
     
     return table, header
+
+
