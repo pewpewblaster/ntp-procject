@@ -7,7 +7,7 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from access_connector import import_product
+from access_connector import import_product, get_table
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -142,6 +142,8 @@ class Ui_MainWindow(object):
         self.button_save_warehouse = QtWidgets.QPushButton(parent=self.group_box_warehouse)
         self.button_save_warehouse.setGeometry(QtCore.QRect(130, 160, 111, 23))
         self.button_save_warehouse.setObjectName("button_save_warehouse")
+        
+        #group box selected warehouse
         self.group_box_selected_warehouse = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_selected_warehouse.setGeometry(QtCore.QRect(10, 100, 211, 241))
         self.group_box_selected_warehouse.setObjectName("group_box_selected_warehouse")
@@ -175,6 +177,16 @@ class Ui_MainWindow(object):
         self.label_warehouse_information_country = QtWidgets.QLabel(parent=self.group_box_selected_warehouse)
         self.label_warehouse_information_country.setGeometry(QtCore.QRect(20, 120, 111, 16))
         self.label_warehouse_information_country.setObjectName("label_warehouse_information_country")
+        
+        # select warehouse button and edit line widget
+        self.line_edit_select_warehouse = QtWidgets.QLineEdit(parent=self.group_box_selected_warehouse)
+        self.line_edit_select_warehouse.setGeometry(QtCore.QRect(20, 150, 151, 20))
+        self.line_edit_select_warehouse.setObjectName("line_edit_select_warehouse")
+        self.push_button_select_warehouse = QtWidgets.QPushButton(parent=self.group_box_selected_warehouse)
+        self.push_button_select_warehouse.setGeometry(QtCore.QRect(20, 180, 151, 23))
+        self.push_button_select_warehouse.setObjectName("push_button_select_warehouse")
+        self.push_button_select_warehouse.clicked.connect(self.table_show_data)
+        
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(30, 340, 47, 13))
         self.label.setText("")
@@ -190,7 +202,10 @@ class Ui_MainWindow(object):
         self.combo_box_category_filter.addItem("")
         self.combo_box_category_filter.addItem("")
         self.combo_box_category_filter.addItem("")
+        
         MainWindow.setCentralWidget(self.centralwidget)
+        
+        # menu bar
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
         self.menubar.setEnabled(True)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 772, 21))
@@ -203,16 +218,29 @@ class Ui_MainWindow(object):
         self.actionQuit = QtGui.QAction(parent=MainWindow)
         self.actionQuit.setObjectName("actionQuit")
         
-        self.line_edit_select_warehouse = QtWidgets.QLineEdit(parent=self.group_box_selected_warehouse)
-        self.line_edit_select_warehouse.setGeometry(QtCore.QRect(20, 150, 151, 20))
-        self.line_edit_select_warehouse.setObjectName("line_edit_select_warehouse")
-        self.push_button_select_warehouse = QtWidgets.QPushButton(parent=self.group_box_selected_warehouse)
-        self.push_button_select_warehouse.setGeometry(QtCore.QRect(20, 180, 151, 23))
-        self.push_button_select_warehouse.setObjectName("push_button_select_warehouse")
+
 
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+
+    # funkcije
+    
+    
+    def table_show_data(self):
+        table, header = get_table(self.line_edit_select_warehouse.text())
+        
+        number_of_rows = len(table)
+        number_of_columns = len(table[0]) if number_of_rows > 0 else 0
+        
+        self.table_proizvodi.setRowCount(number_of_rows)
+        self.table_proizvodi.setColumnCount(number_of_columns)
+        self.table_proizvodi.setHorizontalHeaderLabels(header)
+        
+        for x, row in enumerate(table):
+            for y, column_value in enumerate(row):
+                value = QtWidgets .QTableWidgetItem(str(column_value))
+                self.table_proizvodi.setItem(x, y, value)
 
     def add_to_database(self):
         import_product(self.line_edit_products_warehouse_id.text(),

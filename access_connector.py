@@ -58,6 +58,7 @@ def create_new_user(username, password):
         print("Username and password saved to the database.")
         return True
 
+# funkcija za importanje itema u dadtabazu skladiste.proizvodi
 def import_product(warehouse_id,
                     product_name,
                     product_price,
@@ -65,21 +66,36 @@ def import_product(warehouse_id,
                     product_category):
 
     if warehouse_id and product_name and product_price and product_quantity and product_category:
-        connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;'
-        database_skladiste = pyodbc.connect(connection_string)
-        cursor = database_skladiste.cursor()
+        database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+        query = database_skladiste.cursor()
 
         insert_query = 'INSERT INTO proizvodi (skladiste_id, naziv, cijena, kolicina, kategorija) ' \
                         'VALUES (?, ?, ?, ?, ?)'
-        cursor.execute(insert_query, warehouse_id, product_name, product_price, product_quantity, product_category)
+        query.execute(insert_query, warehouse_id, product_name, product_price, product_quantity, product_category)
         database_skladiste.commit()
 
-        cursor.close()
+        query.close()
         database_skladiste.close()
-
-        # Optionally, you can update the table after importing the product
 
         print("Product imported successfully.")
 
- 
+def get_table(warehouse_id):
+    database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+    query = database_skladiste.cursor()
     
+    query_insert = '''
+        SELECT *
+        FROM skladista
+        INNER JOIN proizvodi ON skladista.skladiste_id = proizvodi.skladiste_id
+        WHERE skladista.skladiste_id = ?
+    '''
+    
+    query.execute(query_insert, (warehouse_id,))
+    header = [description[0] for description in query.description]
+    table = query.fetchall()
+    print("Table loaded successfully.")
+    
+    query.close()
+    database_skladiste.close()
+    
+    return table, header
