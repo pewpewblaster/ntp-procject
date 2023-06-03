@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>772</width>
-    <height>677</height>
+    <width>1215</width>
+    <height>675</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,19 +22,6 @@
       <width>691</width>
       <height>201</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QSlider" name="vertical_slider_proizvodi">
-    <property name="geometry">
-     <rect>
-      <x>730</x>
-      <y>370</y>
-      <width>22</width>
-      <height>241</height>
-     </rect>
-    </property>
-    <property name="orientation">
-     <enum>Qt::Vertical</enum>
     </property>
    </widget>
    <widget class="QGroupBox" name="group_box_information">
@@ -157,9 +144,9 @@
    <widget class="QGroupBox" name="group_box_product">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>650</x>
       <y>100</y>
-      <width>231</width>
+      <width>300</width>
       <height>241</height>
      </rect>
     </property>
@@ -170,8 +157,8 @@
      <property name="geometry">
       <rect>
        <x>100</x>
-       <y>200</y>
-       <width>111</width>
+       <y>190</y>
+       <width>181</width>
        <height>23</height>
       </rect>
      </property>
@@ -184,7 +171,7 @@
       <rect>
        <x>100</x>
        <y>70</y>
-       <width>111</width>
+       <width>181</width>
        <height>20</height>
       </rect>
      </property>
@@ -194,7 +181,7 @@
       <rect>
        <x>100</x>
        <y>100</y>
-       <width>111</width>
+       <width>181</width>
        <height>20</height>
       </rect>
      </property>
@@ -204,7 +191,7 @@
       <rect>
        <x>100</x>
        <y>130</y>
-       <width>111</width>
+       <width>181</width>
        <height>20</height>
       </rect>
      </property>
@@ -214,7 +201,7 @@
       <rect>
        <x>100</x>
        <y>40</y>
-       <width>111</width>
+       <width>181</width>
        <height>20</height>
       </rect>
      </property>
@@ -301,7 +288,7 @@
       <rect>
        <x>100</x>
        <y>160</y>
-       <width>111</width>
+       <width>181</width>
        <height>20</height>
       </rect>
      </property>
@@ -310,9 +297,9 @@
    <widget class="QGroupBox" name="group_box_warehouse">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>330</x>
       <y>100</y>
-      <width>261</width>
+      <width>300</width>
       <height>241</height>
      </rect>
     </property>
@@ -337,7 +324,7 @@
       <rect>
        <x>130</x>
        <y>40</y>
-       <width>111</width>
+       <width>151</width>
        <height>20</height>
       </rect>
      </property>
@@ -347,7 +334,7 @@
       <rect>
        <x>130</x>
        <y>70</y>
-       <width>111</width>
+       <width>151</width>
        <height>20</height>
       </rect>
      </property>
@@ -370,7 +357,7 @@
       <rect>
        <x>130</x>
        <y>100</y>
-       <width>111</width>
+       <width>151</width>
        <height>20</height>
       </rect>
      </property>
@@ -393,7 +380,7 @@
       <rect>
        <x>130</x>
        <y>130</y>
-       <width>111</width>
+       <width>151</width>
        <height>20</height>
       </rect>
      </property>
@@ -416,7 +403,7 @@
       <rect>
        <x>130</x>
        <y>160</y>
-       <width>111</width>
+       <width>151</width>
        <height>23</height>
       </rect>
      </property>
@@ -430,8 +417,8 @@
      <rect>
       <x>10</x>
       <y>100</y>
-      <width>211</width>
-      <height>241</height>
+      <width>300</width>
+      <height>243</height>
      </rect>
     </property>
     <property name="title">
@@ -455,8 +442,8 @@
       <rect>
        <x>140</x>
        <y>40</y>
-       <width>47</width>
-       <height>13</height>
+       <width>141</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -481,8 +468,8 @@
       <rect>
        <x>140</x>
        <y>60</y>
-       <width>47</width>
-       <height>13</height>
+       <width>141</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -494,8 +481,8 @@
       <rect>
        <x>140</x>
        <y>80</y>
-       <width>47</width>
-       <height>13</height>
+       <width>131</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -507,8 +494,8 @@
       <rect>
        <x>140</x>
        <y>100</y>
-       <width>47</width>
-       <height>13</height>
+       <width>131</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -546,8 +533,8 @@
       <rect>
        <x>140</x>
        <y>120</y>
-       <width>47</width>
-       <height>13</height>
+       <width>141</width>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -652,6 +639,19 @@
      </property>
     </item>
    </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>370</y>
+      <width>101</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show products</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="enabled">
@@ -661,7 +661,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>772</width>
+     <width>1215</width>
      <height>21</height>
     </rect>
    </property>

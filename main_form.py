@@ -139,6 +139,7 @@ class Ui_MainWindow(object):
         self.button_save_warehouse = QtWidgets.QPushButton(parent=self.group_box_warehouse)
         self.button_save_warehouse.setGeometry(QtCore.QRect(130, 160, 111, 23))
         self.button_save_warehouse.setObjectName("button_save_warehouse")
+
         
         #group box selected warehouse
         self.group_box_selected_warehouse = QtWidgets.QGroupBox(parent=self.centralwidget)
@@ -174,7 +175,6 @@ class Ui_MainWindow(object):
         self.label_warehouse_information_country = QtWidgets.QLabel(parent=self.group_box_selected_warehouse)
         self.label_warehouse_information_country.setGeometry(QtCore.QRect(20, 120, 111, 16))
         self.label_warehouse_information_country.setObjectName("label_warehouse_information_country")
-        
         # select warehouse button and edit line widget
         self.line_edit_select_warehouse = QtWidgets.QLineEdit(parent=self.group_box_selected_warehouse)
         self.line_edit_select_warehouse.setGeometry(QtCore.QRect(20, 150, 151, 20))
@@ -182,7 +182,8 @@ class Ui_MainWindow(object):
         self.push_button_select_warehouse = QtWidgets.QPushButton(parent=self.group_box_selected_warehouse)
         self.push_button_select_warehouse.setGeometry(QtCore.QRect(20, 180, 151, 23))
         self.push_button_select_warehouse.setObjectName("push_button_select_warehouse")
-        self.push_button_select_warehouse.clicked.connect(self.table_show_data)
+        self.push_button_select_warehouse.clicked.connect(self.table_show_data)        
+
         
         self.label = QtWidgets.QLabel(parent=self.centralwidget)
         self.label.setGeometry(QtCore.QRect(30, 340, 47, 13))
@@ -214,9 +215,6 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
         self.actionQuit = QtGui.QAction(parent=MainWindow)
         self.actionQuit.setObjectName("actionQuit")
-        
-
-
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -237,21 +235,36 @@ class Ui_MainWindow(object):
                 item = QtWidgets.QTableWidgetItem(str(value))
                 self.table_proizvodi.setItem(row, col, item)
             
-    def table_show_data(self):
-        self.table_proizvodi_array, header = get_table(self.line_edit_select_warehouse.text())
+    def table_show_data(self):     
+        warehouse_id = int(self.line_edit_select_warehouse.text())
+        self.table_proizvodi_array, header, count_skladiste_id = get_table(warehouse_id)
         print(self.table_proizvodi_array)
+        print("Print count_skladiste_id {}".format(count_skladiste_id))
+
+        if warehouse_id not in count_skladiste_id:
+            print("Ne postji skladiste sa indexom {}".format(warehouse_id))
+        else:
+            
+            number_of_rows = len(self.table_proizvodi_array)
+            number_of_columns = len(self.table_proizvodi_array[0]) if number_of_rows > 0 else 0
+            
+            self.table_proizvodi.setRowCount(number_of_rows)
+            self.table_proizvodi.setColumnCount(number_of_columns)
+            self.table_proizvodi.setHorizontalHeaderLabels(header)
+            
+            for x, row in enumerate(self.table_proizvodi_array):
+                for y, column_value in enumerate(row):
+                    value = QtWidgets .QTableWidgetItem(str(column_value))
+                    self.table_proizvodi.setItem(x, y, value)
+            
+            # update information labela
+            self.label_warehouse_information_id_show.setText(str(self.table_proizvodi_array[0][0]))
+            self.label_warehouse_information_name_show.setText(str(self.table_proizvodi_array[0][1]))
+            self.label_warehouse_information_street_show.setText(str(self.table_proizvodi_array[0][2]))
+            self.label_warehouse_information_city_show.setText(str(self.table_proizvodi_array[0][3]))
+            self.label_warehouse_information_country_show.setText(str(self.table_proizvodi_array[0][4]))    
         
-        number_of_rows = len(self.table_proizvodi_array)
-        number_of_columns = len(self.table_proizvodi_array[0]) if number_of_rows > 0 else 0
-        
-        self.table_proizvodi.setRowCount(number_of_rows)
-        self.table_proizvodi.setColumnCount(number_of_columns)
-        self.table_proizvodi.setHorizontalHeaderLabels(header)
-        
-        for x, row in enumerate(self.table_proizvodi_array):
-            for y, column_value in enumerate(row):
-                value = QtWidgets .QTableWidgetItem(str(column_value))
-                self.table_proizvodi.setItem(x, y, value)
+            
 
     def add_to_database(self):
         import_product(self.line_edit_products_warehouse_id.text(),

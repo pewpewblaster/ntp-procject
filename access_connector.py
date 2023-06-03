@@ -114,10 +114,13 @@ def get_table(warehouse_id):
     query.execute(query_insert, (warehouse_id,))
     header = [description[0] for description in query.description]
     table = query.fetchall()
-    print("Table loaded successfully.")
     
+    query_insert = "SELECT skladiste_id FROM skladista"
+    query.execute(query_insert)
+    count_of_skladiste_id = [row.skladiste_id for row in query.fetchall()]
+
     query.close()
     database_skladiste.close()
     
-    return table, header
+    return table, header, count_of_skladiste_id
 
