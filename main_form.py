@@ -22,12 +22,9 @@ class Ui_MainWindow(object):
         self.table_proizvodi.setObjectName("table_proizvodi")
         self.table_proizvodi.setColumnCount(0)
         self.table_proizvodi.setRowCount(0)
-
-        # vertical slider next to the table widget
-        self.vertical_slider_proizvodi = QtWidgets.QSlider(parent=self.centralwidget)
-        self.vertical_slider_proizvodi.setGeometry(QtCore.QRect(730, 370, 22, 241))
-        self.vertical_slider_proizvodi.setOrientation(QtCore.Qt.Orientation.Vertical)
-        self.vertical_slider_proizvodi.setObjectName("vertical_slider_proizvodi")
+        self.table_proizvodi.horizontalHeader().sectionClicked.connect(self.sort_table)
+        self.table_proizvodi_array = []
+        self.sort_order = QtCore.Qt.SortOrder.AscendingOrder
 
         # group box widget - Information
         self.group_box_information = QtWidgets.QGroupBox(parent=self.centralwidget)
@@ -225,19 +222,33 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     # funkcije
-    
-    
+
+    def sort_table(self, logical_index):
+        self.sort_order = QtCore.Qt.SortOrder.DescendingOrder if self.sort_order == QtCore.Qt.SortOrder.AscendingOrder else QtCore.Qt.SortOrder.AscendingOrder
+        self.table_proizvodi_array.sort(key=lambda x: x[logical_index], reverse=self.sort_order == QtCore.Qt.SortOrder.DescendingOrder)
+        self.update_table()
+
+    def update_table(self):
+        self.table_proizvodi.clear()
+        self.table_proizvodi.setRowCount(len(self.table_proizvodi_array))
+        self.table_proizvodi.setColumnCount(len(self.table_proizvodi_array[0]))
+        for row, data in enumerate(self.table_proizvodi_array):
+            for col, value in enumerate(data):
+                item = QtWidgets.QTableWidgetItem(str(value))
+                self.table_proizvodi.setItem(row, col, item)
+            
     def table_show_data(self):
-        table, header = get_table(self.line_edit_select_warehouse.text())
+        self.table_proizvodi_array, header = get_table(self.line_edit_select_warehouse.text())
+        print(self.table_proizvodi_array)
         
-        number_of_rows = len(table)
-        number_of_columns = len(table[0]) if number_of_rows > 0 else 0
+        number_of_rows = len(self.table_proizvodi_array)
+        number_of_columns = len(self.table_proizvodi_array[0]) if number_of_rows > 0 else 0
         
         self.table_proizvodi.setRowCount(number_of_rows)
         self.table_proizvodi.setColumnCount(number_of_columns)
         self.table_proizvodi.setHorizontalHeaderLabels(header)
         
-        for x, row in enumerate(table):
+        for x, row in enumerate(self.table_proizvodi_array):
             for y, column_value in enumerate(row):
                 value = QtWidgets .QTableWidgetItem(str(column_value))
                 self.table_proizvodi.setItem(x, y, value)

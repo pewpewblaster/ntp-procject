@@ -121,4 +121,3 @@ def get_table(warehouse_id):
     
     return table, header
 
-
