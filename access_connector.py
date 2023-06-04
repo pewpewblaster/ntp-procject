@@ -7,14 +7,19 @@ def user_database():
     database_users = pyodbc.connect(connection_string)
     
     query = database_users.cursor()
-    query.execute("SELECT username, password FROM credentials")
+    query.execute("SELECT username FROM credentials")
     users = query.fetchall()
+    
+    # query.fetchall return list that looks like this [('admin', ), ('Username', ), ('matija', ), ('jurica', ), ('jure', ), ('', ), ('matija2', )]
+    # save tuples values with index 0 to a new list 
+
+    users_list = [username[0] for username in users]
     
     query.close()
     database_users.close()
     
     # returns list with tuple (credentials inside of tuple)
-    return users
+    return users_list
 
 # function for checking if username and password match at login
 def check_credentials(username, password):
@@ -99,7 +104,6 @@ def import_warehouse(
 
         print("Warehouse imported successfully.")
 
-
 def get_table(warehouse_id):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
@@ -124,3 +128,6 @@ def get_table(warehouse_id):
     
     return table, header, count_of_skladiste_id
 
+
+x = user_database()
+print(x)

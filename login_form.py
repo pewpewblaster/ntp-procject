@@ -105,7 +105,7 @@ class login_form(object):
             self.label_password.setText(_translate("Form", "Mot de passe:"))
             self.label_information.setText(_translate("Form", "Entrez votre nom d'utilisateur et votre mot de passe"))
             self.label_language.setText(_translate("Form", "Sélectionnez votre langue:"))
-            self.push_button_new_user.setText(_translate("Form", "Créer un nouvel utilisateur"))
+            self.push_button_new_user.setText(_translate("Form", "Gestion des utilisateurs"))
 
         if selected_language == "Croatian":
             _translate = QtCore.QCoreApplication.translate
@@ -116,7 +116,7 @@ class login_form(object):
             self.label_password.setText(_translate("Form", "Lozinka:"))
             self.label_information.setText(_translate("Form", "Unesite korisničko ime i lozinku"))
             self.label_language.setText(_translate("Form", "Odaberite jezik:"))
-            self.push_button_new_user.setText(_translate("Form", "Stvori novog korisnika"))
+            self.push_button_new_user.setText(_translate("Form", "Upravljanje korisnicima"))
 
         if selected_language == "English":
             _translate = QtCore.QCoreApplication.translate
@@ -127,7 +127,7 @@ class login_form(object):
             self.label_password.setText(_translate("Form", "Password:"))
             self.label_information.setText(_translate("Form", "Enter your username and password"))
             self.label_language.setText(_translate("Form", "Select your language:"))
-            self.push_button_new_user.setText(_translate("Form", "Create new user"))
+            self.push_button_new_user.setText(_translate("Form", "User Management"))
 
 
         if selected_language == "German":
@@ -139,7 +139,7 @@ class login_form(object):
             self.label_password.setText(_translate("Form", "Passwort:"))
             self.label_information.setText(_translate("Form", "Geben Sie Ihren Benutzernamen und Ihr Passwort ein"))
             self.label_language.setText(_translate("Form", "Wählen Sie Ihre Sprache:"))
-            self.push_button_new_user.setText(_translate("Form", "Neuen Benutzer erstellen"))
+            self.push_button_new_user.setText(_translate("Form", "Benutzerverwaltung"))
 
         if selected_language == "Spanish":
             _translate = QtCore.QCoreApplication.translate
@@ -150,4 +150,4 @@ class login_form(object):
             self.label_password.setText(_translate("Form", "Contraseña:"))
             self.label_information.setText(_translate("Form", "Ingrese su nombre de usuario y contraseña"))
             self.label_language.setText(_translate("Form", "Seleccione su idioma:"))
-            self.push_button_new_user.setText(_translate("Form", "Crear nuevo usuario"))
+            self.push_button_new_user.setText(_translate("Form", "Gestión de usuarios"))
