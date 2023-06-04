@@ -7,7 +7,7 @@
 
 
 from PyQt6 import QtCore, QtWidgets
-from access_connector import create_new_user, user_database, delete_user_from_database
+from access_connector import create_new_user, user_database, delete_user_from_database, change_password
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -58,6 +58,7 @@ class Ui_Form(object):
         self.button_change_password = QtWidgets.QPushButton(parent=self.group_box_change_password)
         self.button_change_password.setGeometry(QtCore.QRect(20, 130, 241, 23))
         self.button_change_password.setObjectName("button_change_password")
+        self.button_change_password.clicked.connect(self.password_change)
         
         # group box - delete users
         self.group_box_delete_users = QtWidgets.QGroupBox(parent=Form)
@@ -95,7 +96,18 @@ class Ui_Form(object):
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 
-    def create_new_user(self, Form):
+    def password_change(self):
+        confirmation_message = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Question, "Warning!", "Are you sure you want to change the password?", QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No, self.Form)
+        confirmation_result = confirmation_message.exec()
+    
+        if confirmation_result == QtWidgets.QMessageBox.StandardButton.Yes:
+            if change_password(self.edit_username_change.text(), self.edit_password_change.text()):
+                QtWidgets.QMessageBox.warning(self.Form, "Success", "Password changed!")
+            else:
+                QtWidgets.QMessageBox.warning(self.Form, "Error", "Wrong username")
+            
+            
+    def create_new_user(self):
         if create_new_user(self.line_edit_username.text(), self.line_edit_password.text()):
             QtWidgets.QMessageBox.warning(self.Form, "Success", "User created.")
         else:

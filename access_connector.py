@@ -45,7 +45,30 @@ def delete_user_from_database(username_for_deletion):
         print("Usere deleted from database")
         return True
     
-
+def change_password(username_for_password_changing, new_password):
+    connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/users.accdb;'
+    database_users = pyodbc.connect(connection_string)
+    
+    query = database_users.cursor()
+    query.execute("SELECT username FROM credentials")
+    users = query.fetchall()
+    
+    # query.fetchall return list that looks like this [('admin', ), ('Username', ), ('matija', ), ('jurica', ), ('jure', ), ('', ), ('matija2', )]
+    # save tuples values with index 0 to a new list called users_list
+    users_list = [username[0] for username in users]
+    
+    if username_for_password_changing not in users_list:
+        print("Cannot change password for a username that is not inside the database")
+        query.close()
+        database_users.close()
+        return False
+    else:
+        query.execute("UPDATE credentials SET password = ? WHERE username = ?", (new_password, username_for_password_changing))
+        database_users.commit()
+        query.close()
+        database_users.close()
+        print("Password changed successfully")
+        return True
 
 
 # function for checking if username and password match at login
