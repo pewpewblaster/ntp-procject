@@ -7,7 +7,7 @@
 
 
 from PyQt6 import QtCore, QtWidgets
-from access_connector import create_new_user, user_database
+from access_connector import create_new_user, user_database, delete_user_from_database
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -58,6 +58,8 @@ class Ui_Form(object):
         self.button_change_password = QtWidgets.QPushButton(parent=self.group_box_change_password)
         self.button_change_password.setGeometry(QtCore.QRect(20, 130, 241, 23))
         self.button_change_password.setObjectName("button_change_password")
+        
+        # group box - delete users
         self.group_box_delete_users = QtWidgets.QGroupBox(parent=Form)
         self.group_box_delete_users.setGeometry(QtCore.QRect(20, 210, 281, 181))
         self.group_box_delete_users.setObjectName("group_box_delete_users")
@@ -70,17 +72,21 @@ class Ui_Form(object):
         self.button_delete_user = QtWidgets.QPushButton(parent=self.group_box_delete_users)
         self.button_delete_user.setGeometry(QtCore.QRect(20, 70, 241, 23))
         self.button_delete_user.setObjectName("button_delete_user")
+        self.button_delete_user.clicked.connect(self.delete_user)
         
         #group box created users
         self.group_box_created_users = QtWidgets.QGroupBox(parent=Form)
         self.group_box_created_users.setGeometry(QtCore.QRect(320, 210, 281, 181))
         self.group_box_created_users.setObjectName("group_box_created_users")
         
+        # table that shows usernames from database
         self.table_created_users = QtWidgets.QTableWidget(parent=self.group_box_created_users)
         self.table_created_users.setGeometry(QtCore.QRect(20, 50, 241, 131))
         self.table_created_users.setObjectName("table_created_users")
         self.array_of_users = []
-         
+        
+        # button when pressed calls function show_users and shows users on table_created_users
+        # QTableWidget
         self.button_show_users = QtWidgets.QPushButton(parent=self.group_box_created_users)
         self.button_show_users.setGeometry(QtCore.QRect(20, 20, 241, 23))
         self.button_show_users.setObjectName("button_show_users")
@@ -111,6 +117,17 @@ class Ui_Form(object):
             value = QtWidgets.QTableWidgetItem(str(column_value))
             self.table_created_users.setItem(x, 0, value)
 
+    def delete_user(self):
+        confirmation_message = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Question, "Warning!", f"Are you sure you want to delete the user: {self.edit_delete_user.text()}?", QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No, self.Form)
+        confirmation_result = confirmation_message.exec()
+        
+        if confirmation_result == QtWidgets.QMessageBox.StandardButton.Yes:
+            if delete_user_from_database(self.edit_delete_user.text()):
+                QtWidgets.QMessageBox.warning(self.Form, "Success", "User deleted!")
+            else:
+                QtWidgets.QMessageBox.warning(self.Form, "Error", "User is not in database")
+            
+    
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))

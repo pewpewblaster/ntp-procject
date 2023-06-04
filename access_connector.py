@@ -11,15 +11,42 @@ def user_database():
     users = query.fetchall()
     
     # query.fetchall return list that looks like this [('admin', ), ('Username', ), ('matija', ), ('jurica', ), ('jure', ), ('', ), ('matija2', )]
-    # save tuples values with index 0 to a new list 
-
+    # save tuples values with index 0 to a new list called users_list
     users_list = [username[0] for username in users]
     
     query.close()
     database_users.close()
     
-    # returns list with tuple (credentials inside of tuple)
+    # returns list with all usernames from databse users table credentials
     return users_list
+
+def delete_user_from_database(username_for_deletion):
+    connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/users.accdb;'
+    database_users = pyodbc.connect(connection_string)
+    
+    query = database_users.cursor()
+    query.execute("SELECT username FROM credentials")
+    users = query.fetchall()
+    
+    # query.fetchall return list that looks like this [('admin', ), ('Username', ), ('matija', ), ('jurica', ), ('jure', ), ('', ), ('matija2', )]
+    # save tuples values with index 0 to a new list called users_list
+    users_list = [username[0] for username in users]
+    
+    if username_for_deletion not in users_list:
+        print("Can not delete username that is not inside the database")
+        query.close()
+        database_users.close()
+        return False
+    else:
+        query.execute("DELETE FROM credentials WHERE username = ?", username_for_deletion)
+        database_users.commit()
+        query.close()
+        database_users.close()
+        print("Usere deleted from database")
+        return True
+    
+
+
 
 # function for checking if username and password match at login
 def check_credentials(username, password):
@@ -127,7 +154,3 @@ def get_table(warehouse_id):
     database_skladiste.close()
     
     return table, header, count_of_skladiste_id
-
-
-x = user_database()
-print(x)
