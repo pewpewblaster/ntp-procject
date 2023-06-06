@@ -177,3 +177,27 @@ def get_table(warehouse_id):
     database_skladiste.close()
     
     return table, header, count_of_skladiste_id
+
+def get_table_by_filter(filter_product_by_name):
+    database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+    query = database_skladiste.cursor()
+    
+    query_insert = '''
+        SELECT *
+        FROM skladista
+        INNER JOIN proizvodi ON skladista.skladiste_id = proizvodi.skladiste_id
+        WHERE proizvodi.naziv LIKE ?
+    '''
+    query.execute(query_insert, (filter_product_by_name,))
+
+        
+    header = [description[0] for description in query.description]
+    table = query.fetchall()
+
+    # ako query prodje u 'has_result' se zapise True, suprutno False
+    has_result = bool(table)
+
+    query.close()
+    database_skladiste.close()
+    
+    return table, header, has_result

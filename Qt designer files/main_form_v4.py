@@ -7,14 +7,13 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from access_connector import import_product, get_table, get_table_by_filter
+from access_connector import import_product, get_table
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1300, 675)
-        self.MainWindow = MainWindow
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         
@@ -26,15 +25,8 @@ class Ui_MainWindow(object):
         self.table_proizvodi.setRowCount(0)
         # klickom na header tablice pokrece se sort_table funkcija
         self.table_proizvodi.horizontalHeader().sectionClicked.connect(self.sort_table)
-        # liste u koju funkcija 'get_table' iz modula 'access_connector' sprema podatke o
-        # podatke tablici i headeru tablice 
+        # lista u koju se spremaju 
         self.table_proizvodi_array = []
-        self.header = []
-        # liste u koju funkcija 'get_table_by_filter' iz modula 'access_connector' sprema podatke o
-        # podatke tablici i headeru tablice po unesenom filteru u edit box
-        self.table_filter_array = []
-        self.table_filter_header = []
-        
         self.sort_order = QtCore.Qt.SortOrder.AscendingOrder
 
 
@@ -104,14 +96,11 @@ class Ui_MainWindow(object):
         self.push_button_select_warehouse = QtWidgets.QPushButton(parent=self.group_box_selected_warehouse)
         self.push_button_select_warehouse.setGeometry(QtCore.QRect(20, 180, 151, 23))
         self.push_button_select_warehouse.setObjectName("push_button_select_warehouse")
-        # funkcija kada se klikne na button poziva funkciju table_show_data
-        self.push_button_select_warehouse.clicked.connect(self.table_show_data) 
-        
         self.line_edit_select_warehouse = QtWidgets.QLineEdit(parent=self.group_box_selected_warehouse)
         self.line_edit_select_warehouse.setGeometry(QtCore.QRect(20, 150, 151, 20))
         self.line_edit_select_warehouse.setObjectName("line_edit_select_warehouse")
-
-        
+        # funkcija kada se klikne na button poziva funkciju table_show_data
+        self.push_button_select_warehouse.clicked.connect(self.table_show_data) 
 
         ''' table show warehouse and products - desna tablica na GUIu ''' 
         self.table_show_warehouse_products = QtWidgets.QTableView(parent=self.centralwidget)
@@ -123,14 +112,9 @@ class Ui_MainWindow(object):
         self.button_show_warehouses = QtWidgets.QPushButton(parent=self.centralwidget)
         self.button_show_warehouses.setGeometry(QtCore.QRect(1030, 370, 251, 23))
         self.button_show_warehouses.setObjectName("button_show_warehouses")
-        # button button_find_warehouse_by_product
         self.button_find_warehouse_by_product = QtWidgets.QPushButton(parent=self.centralwidget)
         self.button_find_warehouse_by_product.setGeometry(QtCore.QRect(40, 370, 91, 23))
         self.button_find_warehouse_by_product.setObjectName("button_find_warehouse_by_product")
-        # klikom na button 'Find' poziva se funkcija koja ispisuje u tablicu proizvode koji
-        # matchaju filter, ako ne ostaje ispisana zadnja tablica koja se ucitala u widget
-        self.button_find_warehouse_by_product.clicked.connect(self.table_show_data_filter)
-        
         self.edit_find_warehouse_by_product = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.edit_find_warehouse_by_product.setGeometry(QtCore.QRect(140, 370, 181, 20))
         self.edit_find_warehouse_by_product.setObjectName("edit_find_warehouse_by_product")
@@ -350,6 +334,7 @@ class Ui_MainWindow(object):
 
     ''' Custom funkcije  '''
 
+    
     # funkcija koja se poziva kada se klikne na header tablice 'table_proizvodi' koja naknadno poziva funkciju
     # update table
     def sort_table(self, logical_index):
@@ -364,8 +349,6 @@ class Ui_MainWindow(object):
         self.table_proizvodi.clear()
         self.table_proizvodi.setRowCount(len(self.table_proizvodi_array))
         self.table_proizvodi.setColumnCount(len(self.table_proizvodi_array[0]))
-        self.table_proizvodi.setHorizontalHeaderLabels(self.header)
-        
         for row, data in enumerate(self.table_proizvodi_array):
             for col, value in enumerate(data):
                 item = QtWidgets.QTableWidgetItem(str(value))
@@ -373,15 +356,11 @@ class Ui_MainWindow(object):
             
     def table_show_data(self):     
         warehouse_id = int(self.line_edit_select_warehouse.text())
-        # sprema tablicu 'self.table_proizvodi_array' i header tablice u self 'self.header' za
-        # kasniju upotrebu kod sortiranja
-        self.table_proizvodi_array, self.header, count_skladiste_id = get_table(warehouse_id)
+        self.table_proizvodi_array, header, count_skladiste_id = get_table(warehouse_id)
         print(self.table_proizvodi_array)
-        print(self.header)
         print("Print count_skladiste_id {}".format(count_skladiste_id))
 
         if warehouse_id not in count_skladiste_id:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Not warehouse is not in database")
             print("Ne postji skladiste sa indexom {}".format(warehouse_id))
         else:
             
@@ -390,7 +369,7 @@ class Ui_MainWindow(object):
             
             self.table_proizvodi.setRowCount(number_of_rows)
             self.table_proizvodi.setColumnCount(number_of_columns)
-            self.table_proizvodi.setHorizontalHeaderLabels(self.header)
+            self.table_proizvodi.setHorizontalHeaderLabels(header)
             
             for x, row in enumerate(self.table_proizvodi_array):
                 for y, column_value in enumerate(row):
@@ -404,26 +383,7 @@ class Ui_MainWindow(object):
             self.label_warehouse_information_city_show.setText(str(self.table_proizvodi_array[0][3]))
             self.label_warehouse_information_country_show.setText(str(self.table_proizvodi_array[0][4]))    
         
-    def table_show_data_filter(self):
-        product_filter = self.edit_find_warehouse_by_product.text()
-        
-        self.table_filter_array, self.table_filter_header, has_result = get_table_by_filter(product_filter)
-        
-        if has_result == False:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Not found in database")
-        else:
-            number_of_rows = len(self.table_filter_array)
-            number_of_columns = len(self.table_filter_array[0]) if number_of_rows > 0 else 0
             
-            self.table_proizvodi.setRowCount(number_of_rows)
-            self.table_proizvodi.setColumnCount(number_of_columns)
-            self.table_proizvodi.setHorizontalHeaderLabels(self.table_filter_header)
-            
-            for x, row in enumerate(self.table_filter_array):
-                for y, column_value in enumerate(row):
-                    value = QtWidgets .QTableWidgetItem(str(column_value))
-                    self.table_proizvodi.setItem(x, y, value)
-                
 
     def add_to_database(self):
         import_product(self.line_edit_products_warehouse_id.text(),
