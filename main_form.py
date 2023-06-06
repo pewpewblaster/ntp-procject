@@ -7,7 +7,15 @@
 
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from access_connector import import_product, get_table, get_table_by_filter, import_warehouse
+from access_connector import (import_product,
+                              get_table, 
+                              get_table_by_filter, 
+                              import_warehouse,
+                              update_warehouse,
+                              update_product,
+                              delete_product_by_id,
+                              delete_warehouse_by_id,
+                              show_table)
 
 
 class Ui_MainWindow(object):
@@ -26,6 +34,7 @@ class Ui_MainWindow(object):
         self.table_proizvodi.setRowCount(0)
         # klickom na header tablice pokrece se sort_table funkcija
         self.table_proizvodi.horizontalHeader().sectionClicked.connect(self.sort_table)
+        self.sort_order = QtCore.Qt.SortOrder.AscendingOrder
         # liste u koju funkcija 'get_table' iz modula 'access_connector' sprema podatke o
         # podatke tablici i headeru tablice 
         self.table_proizvodi_array = None
@@ -35,7 +44,7 @@ class Ui_MainWindow(object):
         self.table_filter_array = None
         self.table_filter_header = None
         
-        self.sort_order = QtCore.Qt.SortOrder.AscendingOrder
+        
 
 
         ''' group box information - prikaz active language, active user, date, time '''
@@ -114,23 +123,34 @@ class Ui_MainWindow(object):
         
 
         ''' table show warehouse and products - desna tablica na GUIu ''' 
-        self.table_show_warehouse_products = QtWidgets.QTableView(parent=self.centralwidget)
+        self.table_show_warehouse_products = QtWidgets.QTableWidget(parent=self.centralwidget)
         self.table_show_warehouse_products.setGeometry(QtCore.QRect(750, 410, 531, 201))
         self.table_show_warehouse_products.setObjectName("table_show_warehouse_products")
+        self.table_show_warehouse_products.setColumnCount(0)
+        self.table_show_warehouse_products.setRowCount(0)
+        self.table_show_warehouse_products.horizontalHeader()
+        # array u koji se sprema tablica warehouse/products
+        self.table_show_warehouse_products_array = None
+        self.table_show_warehouse_products_header = None
+        #button za prikaz tablice produkti
         self.button_show_products = QtWidgets.QPushButton(parent=self.centralwidget)
         self.button_show_products.setGeometry(QtCore.QRect(750, 370, 251, 23))
         self.button_show_products.setObjectName("button_show_products")
+        self.button_show_products.clicked.connect(self.show_products)
+        #button za prikaz tablice skladiste
         self.button_show_warehouses = QtWidgets.QPushButton(parent=self.centralwidget)
         self.button_show_warehouses.setGeometry(QtCore.QRect(1030, 370, 251, 23))
         self.button_show_warehouses.setObjectName("button_show_warehouses")
         # button button_find_warehouse_by_product
+        self.button_show_warehouses.clicked.connect(self.show_warehouses)
+
+        
         self.button_find_warehouse_by_product = QtWidgets.QPushButton(parent=self.centralwidget)
         self.button_find_warehouse_by_product.setGeometry(QtCore.QRect(40, 370, 91, 23))
         self.button_find_warehouse_by_product.setObjectName("button_find_warehouse_by_product")
         # klikom na button 'Find' poziva se funkcija koja ispisuje u tablicu proizvode koji
         # matchaju filter, ako ne ostaje ispisana zadnja tablica koja se ucitala u widget
         self.button_find_warehouse_by_product.clicked.connect(self.table_show_data_filter)
-        
         self.edit_find_warehouse_by_product = QtWidgets.QLineEdit(parent=self.centralwidget)
         self.edit_find_warehouse_by_product.setGeometry(QtCore.QRect(140, 370, 181, 20))
         self.edit_find_warehouse_by_product.setObjectName("edit_find_warehouse_by_product")
@@ -148,9 +168,11 @@ class Ui_MainWindow(object):
         self.label_delete_products = QtWidgets.QLabel(parent=self.groupBox)
         self.label_delete_products.setGeometry(QtCore.QRect(20, 140, 261, 20))
         self.label_delete_products.setObjectName("label_delete_products")
+        #button delete warehouse
         self.button_delete_warehouse = QtWidgets.QPushButton(parent=self.groupBox)
         self.button_delete_warehouse.setGeometry(QtCore.QRect(20, 100, 251, 23))
         self.button_delete_warehouse.setObjectName("button_delete_warehouse")
+        self.button_delete_warehouse.clicked.connect(self.delete_warehouse)
         self.edit_delete_warehouse = QtWidgets.QLineEdit(parent=self.groupBox)
         self.edit_delete_warehouse.setGeometry(QtCore.QRect(20, 70, 251, 20))
         self.edit_delete_warehouse.setObjectName("edit_delete_warehouse")
@@ -160,6 +182,7 @@ class Ui_MainWindow(object):
         self.button_delete_product = QtWidgets.QPushButton(parent=self.groupBox)
         self.button_delete_product.setGeometry(QtCore.QRect(20, 200, 251, 23))
         self.button_delete_product.setObjectName("button_delete_product")
+        self.button_delete_product.clicked.connect(self.delete_product)
         
         ''' tab warehouse '''
         self.tab_warehouse = QtWidgets.QTabWidget(parent=self.centralwidget)
@@ -216,9 +239,11 @@ class Ui_MainWindow(object):
         self.label_warehouse_name_edit = QtWidgets.QLabel(parent=self.tab_edit_warehouse)
         self.label_warehouse_name_edit.setGeometry(QtCore.QRect(20, 40, 101, 20))
         self.label_warehouse_name_edit.setObjectName("label_warehouse_name_edit")
+        # button koji na click poziva funkciju <blank> koja mijenja value warehouse u databazi
         self.button_edit_warehouse = QtWidgets.QPushButton(parent=self.tab_edit_warehouse)
         self.button_edit_warehouse.setGeometry(QtCore.QRect(20, 170, 261, 23))
         self.button_edit_warehouse.setObjectName("button_edit_warehouse")
+        self.button_edit_warehouse.clicked.connect(self.change_warehouse_values)
         self.line_edit_warehoue_city_edit = QtWidgets.QLineEdit(parent=self.tab_edit_warehouse)
         self.line_edit_warehoue_city_edit.setGeometry(QtCore.QRect(130, 100, 151, 20))
         self.line_edit_warehoue_city_edit.setObjectName("line_edit_warehoue_city_edit")
@@ -276,6 +301,7 @@ class Ui_MainWindow(object):
         self.button_save_product = QtWidgets.QPushButton(parent=self.tab_add_product)
         self.button_save_product.setGeometry(QtCore.QRect(20, 170, 261, 23))
         self.button_save_product.setObjectName("button_save_product")
+        
         # button koji na klick poziva funkciju add_to_database_products 
         self.button_save_product.clicked.connect(self.add_to_database_products)
         self.line_edit_products_price = QtWidgets.QLineEdit(parent=self.tab_add_product)
@@ -322,9 +348,13 @@ class Ui_MainWindow(object):
         self.line_edit_products_quantity_edit = QtWidgets.QLineEdit(parent=self.tab_edit_product)
         self.line_edit_products_quantity_edit.setGeometry(QtCore.QRect(100, 130, 181, 20))
         self.line_edit_products_quantity_edit.setObjectName("line_edit_products_quantity_edit")
+        
+        # button koji na click poziva funkciju 'change_product_values'
         self.button_edit_products = QtWidgets.QPushButton(parent=self.tab_edit_product)
         self.button_edit_products.setGeometry(QtCore.QRect(20, 190, 261, 23))
         self.button_edit_products.setObjectName("button_edit_products")
+        self.button_edit_products.clicked.connect(self.change_product_values)
+        
         self.line_edit_products_name_edit = QtWidgets.QLineEdit(parent=self.tab_edit_product)
         self.line_edit_products_name_edit.setGeometry(QtCore.QRect(100, 70, 181, 20))
         self.line_edit_products_name_edit.setObjectName("line_edit_products_name_edit")
@@ -384,7 +414,14 @@ class Ui_MainWindow(object):
                 self.table_proizvodi.setItem(row, col, item)
             
     def table_show_data(self):     
-        warehouse_id = int(self.line_edit_select_warehouse.text())
+        warehouse_id = self.line_edit_select_warehouse.text()
+        
+        if not warehouse_id:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "You need to enter warehouse id!")
+            return
+        
+        warehouse_id = int(warehouse_id)
+        print('warehouse id: ', warehouse_id)
         # sprema tablicu 'self.table_proizvodi_array' i header tablice u self 'self.header' za
         # kasniju upotrebu kod sortiranja
 
@@ -458,6 +495,71 @@ class Ui_MainWindow(object):
                          self.line_edit_warehoue_city.text(),
                          self.line_edit_warehoue_country.text())
 
+    def change_product_values(self):
+        if update_product(self.line_edit_product_id.text(),
+                            self.line_edit_products_warehouse_id_edit.text(),
+                            self.line_edit_products_name_edit.text(),
+                            self.line_edit_products_price_edit.text(),
+                            self.line_edit_products_quantity_edit.text(),
+                            self.line_edit_products_category_edit.text()) == True:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Success", "Product updated!")
+        else:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Product do not exist in database!")
+
+    def change_warehouse_values(self):
+        if update_warehouse(self.line_edit_warehoue_name_id_edit.text(),
+                            self.line_edit_warehoue_name_edit.text(),
+                            self.line_edit_warehoue_street_edit.text(),
+                            self.line_edit_warehoue_city_edit.text(),
+                            self.line_edit_warehoue_country_edit.text()) == True:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Success", "Warehouse updated!")
+        else:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Warehouse do not exist in database!")
+    
+    def delete_product(self):
+        if delete_product_by_id(self.edit_delete_products.text()) == True:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Success", "Product deleted!")
+        else:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", f"Product with id: {self.edit_delete_products.text()} is not in database!")
+
+    def delete_warehouse(self):
+        if delete_warehouse_by_id(self.edit_delete_warehouse.text()) == True:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Success", "Product deleted!")
+        else:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", f"Product with id: {self.edit_delete_warehouse.text()} is not in database!")
+    
+    
+    def show_warehouses(self):
+        self.table_show_warehouse_products_array, self.table_show_warehouse_products_header = show_table("warehouse") 
+        
+        number_of_rows = len(self.table_show_warehouse_products_array)
+        number_of_columns = len(self.table_show_warehouse_products_array[0]) if number_of_rows > 0 else 0
+            
+        self.table_show_warehouse_products.setRowCount(number_of_rows)
+        self.table_show_warehouse_products.setColumnCount(number_of_columns)
+        self.table_show_warehouse_products.setHorizontalHeaderLabels(self.table_show_warehouse_products_header)
+        
+        for x, row in enumerate(self.table_show_warehouse_products_array):
+            for y, column_value in enumerate(row):
+                value = QtWidgets .QTableWidgetItem(str(column_value))
+                self.table_show_warehouse_products.setItem(x, y, value)
+
+    
+    def show_products(self):
+        self.table_show_warehouse_products_array, self.table_show_warehouse_products_header= show_table("product") 
+        
+        number_of_rows = len(self.table_show_warehouse_products_array)
+        number_of_columns = len(self.table_show_warehouse_products_array[0]) if number_of_rows > 0 else 0
+            
+        self.table_show_warehouse_products.setRowCount(number_of_rows)
+        self.table_show_warehouse_products.setColumnCount(number_of_columns)
+        self.table_show_warehouse_products.setHorizontalHeaderLabels(self.table_show_warehouse_products_header)
+        
+        for x, row in enumerate(self.table_show_warehouse_products_array):
+            for y, column_value in enumerate(row):
+                value = QtWidgets .QTableWidgetItem(str(column_value))
+                self.table_show_warehouse_products.setItem(x, y, value)
+    
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
