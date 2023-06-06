@@ -4,17 +4,27 @@ from login_form import login_form
 from PyQt6.QtGui import QFont, QPalette, QColor
 import configparser
 
-def settings(widget, config):
-    font_name = config.get('Theme', 'font')
-    font_size = int(config.get('Theme', 'font_size'))
-    background_color = tuple(map(int, config.get('Theme', 'background_color').split(',')))
+class ApplicationSettings:
+    def __init__(self, widget, config):
+        self.widget = widget
+        self.config = config
+        self.font_name = None
+        self.font_size = None
+        self.background_color = None
+        self.font = None
+        
+    def apply_settings(self):
+        self.font_name = self.config.get('Theme', 'font')
+        self.font_size = int(self.config.get('Theme', 'font_size'))
+        self.background_color = tuple(map(int, self.config.get('Theme', 'background_color').split(',')))
 
-    font = QFont(font_name, font_size)
-    widget.setFont(font)
+        font = QFont(self.font_name, self.font_size)
+        self.widget.setFont(font)
 
-    palette = QPalette()
-    palette.setColor(QPalette.ColorRole.Window, QColor(*background_color))
-    widget.setPalette(palette)
+        palette = QPalette()
+        palette.setColor(QPalette.ColorRole.Window, QColor(*self.background_color))
+        self.widget.setPalette(palette)
+ 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -23,7 +33,8 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('config/config.ini')
 
-    settings(window, config)
+    app_settings = ApplicationSettings(window, config)
+    app_settings.apply_settings()
 
     window.setGeometry(100, 100, 250, 300)
 
