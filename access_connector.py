@@ -20,6 +20,11 @@ def user_database():
     # returns list with all usernames from databse users table credentials
     return users_list
 
+def show_warehouses():
+    pass
+def show_products():
+    pass
+
 def delete_user_from_database(username_for_deletion):
     connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/users.accdb;'
     database_users = pyodbc.connect(connection_string)
@@ -134,24 +139,23 @@ def import_product(warehouse_id,
 
         print("Product imported successfully.")
         
-def import_warehouse(
-                    warehouse_name,
-                    warehouse_address,
-                    warehouse_city,
-                    warehouse_country):
-
-    if warehouse_name and warehouse_address and warehouse_city and warehouse_country:
+def import_warehouse(warehouse_name,
+                     warehouse_address,
+                     warehouse_city,
+                     warehouse_county):
+    
+    if warehouse_name and warehouse_address and warehouse_city and warehouse_county:
         database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
         query = database_skladiste.cursor()
-
-        insert_query = 'INSERT INTO skladista (naziv_skladista, adresa, grad, drzava) ' \
+        
+        insert_query = 'INSERT INTO skladista (naziv_skladista, adresa, grad, drzava)' \
                         'VALUES (?, ?, ?, ?)'
-        query.execute(insert_query, warehouse_name, warehouse_address, warehouse_city, warehouse_country)
+        query.execute(insert_query, warehouse_name, warehouse_address, warehouse_city, warehouse_county)
         database_skladiste.commit()
-
+        
         query.close()
         database_skladiste.close()
-
+        
         print("Warehouse imported successfully.")
 
 def get_table(warehouse_id):
@@ -169,13 +173,14 @@ def get_table(warehouse_id):
     header = [description[0] for description in query.description]
     table = query.fetchall()
     
+    
     query_insert = "SELECT skladiste_id FROM skladista"
     query.execute(query_insert)
     count_of_skladiste_id = [row.skladiste_id for row in query.fetchall()]
 
     query.close()
     database_skladiste.close()
-    
+    print(table)
     return table, header, count_of_skladiste_id
 
 def get_table_by_filter(filter_product_by_name):
@@ -186,18 +191,18 @@ def get_table_by_filter(filter_product_by_name):
         SELECT *
         FROM skladista
         INNER JOIN proizvodi ON skladista.skladiste_id = proizvodi.skladiste_id
-        WHERE proizvodi.naziv LIKE ?
+        WHERE proizvodi.naziv = ?
     '''
     query.execute(query_insert, (filter_product_by_name,))
+    table = query.fetchall()
 
         
     header = [description[0] for description in query.description]
-    table = query.fetchall()
 
     # ako query prodje u 'has_result' se zapise True, suprutno False
     has_result = bool(table)
 
     query.close()
     database_skladiste.close()
-    
+    print(table)
     return table, header, has_result
