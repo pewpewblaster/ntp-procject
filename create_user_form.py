@@ -9,6 +9,9 @@
 from PyQt6 import QtCore, QtWidgets
 from access_connector import create_new_user, user_database, delete_user_from_database, change_password
 
+''' global variables'''
+
+''' classes '''
 class Ui_Form(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")

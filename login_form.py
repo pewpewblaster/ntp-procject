@@ -3,10 +3,16 @@ from access_connector import check_credentials
 from main_form import Ui_MainWindow
 from create_user_form import Ui_Form
 
+
+''' global variable'''
+
+
+''' classes '''
 class login_form(object):
     def login_ui(self, Form):
-        Form.setObjectName("Form")
         self.Form = Form
+        Form.setObjectName("Form")
+
 
         # login button
         self.login_button = QtWidgets.QPushButton(parent=Form)
@@ -83,9 +89,12 @@ class login_form(object):
 
     def login(self):
         if check_credentials(self.edit_username.text(), self.edit_password.text()):
+            global user
+            user = self.edit_username.text()
+            
             self.main_window = QtWidgets.QMainWindow()
             self.ui = Ui_MainWindow()
-            self.ui.setupUi(self.main_window)
+            self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
             self.main_window.show()
             self.Form.close()
         else:
@@ -95,7 +104,7 @@ class login_form(object):
     # localization
     def language_select(self, Form, selected_language):
         selected_language = self.comboBox.currentText()
-
+        
         if selected_language == "French":
             _translate = QtCore.QCoreApplication.translate
             Form.setWindowTitle(_translate("Form", "Formulaire de connexion"))

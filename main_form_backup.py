@@ -382,44 +382,6 @@ class Ui_MainWindow(object):
         self.line_edit_product_id.setObjectName("line_edit_product_id")
         self.tab_products.addTab(self.tab_edit_product, "")
         
-        # tab picture products - dodavanje i prikaz blob fileova - u ovom slucaju slika produkata
-        self.tab_picture_product = QtWidgets.QWidget()
-        self.tab_picture_product.setObjectName("tab_picture_product")
-        self.labela_add_picture_id = QtWidgets.QLabel(parent=self.tab_picture_product)
-        self.labela_add_picture_id.setGeometry(QtCore.QRect(20, 20, 251, 21))
-        self.labela_add_picture_id.setObjectName("labela_add_picture_id")
-        self.edit_add_picture_id = QtWidgets.QLineEdit(parent=self.tab_picture_product)
-        self.edit_add_picture_id.setGeometry(QtCore.QRect(20, 50, 251, 20))
-        self.edit_add_picture_id.setObjectName("edit_add_picture_id")
-        
-        # button za odabit slike lokalno sa PC-a
-        self.button_select_picture = QtWidgets.QPushButton(parent=self.tab_picture_product)
-        self.button_select_picture.setGeometry(QtCore.QRect(20, 80, 121, 23))
-        self.button_select_picture.setObjectName("button_select_picture")
-        self.button_select_picture.clicked.connect(self.load_picture)
-        # privremena varijabla za 
-        self.temp_blob_variable = None
-        
-        self.button_save_picture = QtWidgets.QPushButton(parent=self.tab_picture_product)
-        self.button_save_picture.setGeometry(QtCore.QRect(150, 80, 121, 23))
-        self.button_save_picture.setObjectName("button_save_picture")
-        self.label_file_name = QtWidgets.QLabel(parent=self.tab_picture_product)
-        self.label_file_name.setGeometry(QtCore.QRect(20, 110, 111, 20))
-        self.label_file_name.setObjectName("label_file_name")
-        self.label_file_name_show = QtWidgets.QLabel(parent=self.tab_picture_product)
-        self.label_file_name_show.setGeometry(QtCore.QRect(146, 110, 121, 20))
-        self.label_file_name_show.setObjectName("label_file_name_show")
-        self.label_show_picture_id = QtWidgets.QLabel(parent=self.tab_picture_product)
-        self.label_show_picture_id.setGeometry(QtCore.QRect(20, 140, 251, 16))
-        self.label_show_picture_id.setObjectName("label_show_picture_id")
-        self.lineEdit = QtWidgets.QLineEdit(parent=self.tab_picture_product)
-        self.lineEdit.setGeometry(QtCore.QRect(20, 170, 113, 20))
-        self.lineEdit.setObjectName("lineEdit")
-        self.button_show_picture = QtWidgets.QPushButton(parent=self.tab_picture_product)
-        self.button_show_picture.setGeometry(QtCore.QRect(150, 170, 121, 23))
-        self.button_show_picture.setObjectName("button_show_picture")
-        self.tab_products.addTab(self.tab_picture_product, "")
-        
         MainWindow.setCentralWidget(self.centralwidget)
         
         ''' menu bar widget - trenutno prazan i ne vidi se'''
@@ -444,18 +406,6 @@ class Ui_MainWindow(object):
 
     ''' Custom funkcije  '''
 
-    def load_picture(self):
-        file_dialog = QtWidgets.QFileDialog()
-        file_dialog.setWindowTitle("Select Image")
-        file_dialog.setFileMode(QtWidgets.QFileDialog.FileMode.ExistingFile)
-        file_dialog.setNameFilter("Images (*.png *.xpm *.jpg *.bmp)")
-        
-        if file_dialog.exec() == QtWidgets.QFileDialog.DialogCode.Accepted:
-            file_path = file_dialog.selectedFiles()[0]
-            self.temp_variable = file_path
-            file_name = file_dialog.selectedFiles()[0].split("/")[-1]
-            self.label_file_name_show.setText(file_name) 
-    
     # funkcija koja se poziva kada se klikne na header tablice 'table_proizvodi' koja naknadno poziva funkciju
     # update table
     def sort_table(self, logical_index):
@@ -683,11 +633,4 @@ class Ui_MainWindow(object):
         self.button_edit_products.setText(_translate("MainWindow", "Edit"))
         self.label_product_id_edit.setText(_translate("MainWindow", "Product id"))
         self.tab_products.setTabText(self.tab_products.indexOf(self.tab_edit_product), _translate("MainWindow", "Edit product"))
-        self.labela_add_picture_id.setText(_translate("MainWindow", "Add product picture by product id"))
-        self.button_select_picture.setText(_translate("MainWindow", "Select picture"))
-        self.button_save_picture.setText(_translate("MainWindow", "Save to database"))
-        self.label_file_name.setText(_translate("MainWindow", "File name:"))
-        self.label_show_picture_id.setText(_translate("MainWindow", "Enter product ID which picture you would like to see"))
-        self.button_show_picture.setText(_translate("MainWindow", "Show picture"))
-        self.tab_products.setTabText(self.tab_products.indexOf(self.tab_picture_product), _translate("MainWindow", "Add/Show product picture"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))

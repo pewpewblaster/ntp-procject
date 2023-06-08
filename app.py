@@ -4,6 +4,11 @@ from login_form import login_form
 from PyQt6.QtGui import QFont, QPalette, QColor
 import configparser
 
+'''glbal variables'''
+language = None
+user = None
+
+''' classes '''
 class ApplicationSettings:
     def __init__(self, widget, config):
         self.widget = widget
@@ -24,7 +29,25 @@ class ApplicationSettings:
         palette = QPalette()
         palette.setColor(QPalette.ColorRole.Window, QColor(*self.background_color))
         self.widget.setPalette(palette)
- 
+
+class user_language:
+    def __init__(self):
+        self.username = None
+        self.language = None
+        
+    def get_language(self, selected_language):
+        self.language = selected_language
+        
+    def set_language(self):
+        return self.language
+
+    def get_username(self, selected_username):
+        self.username = selected_username
+    
+    def set_username(self):
+        return self.username
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -41,4 +64,8 @@ if __name__ == '__main__':
     login_window = login_form()
     login_window.login_ui(window)
     window.show()
+    
+    user_language_object = user_language()
+
+    
     sys.exit(app.exec())
