@@ -38,7 +38,7 @@ if __name__ == '__main__':
     app_settings = ApplicationSettings(window, config)
     app_settings.apply_settings()
 
-    window.setGeometry(100, 100, 250, 300)
+    window.setGeometry(100, 100, 250, 320)
 
     login_window = login_form()
     login_window.login_ui(window)
