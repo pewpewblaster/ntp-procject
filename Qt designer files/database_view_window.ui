@@ -1124,7 +1124,7 @@
        <string>Enter product ID which picture you would like to see</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="edit_show_picture_id">
       <property name="geometry">
        <rect>
         <x>20</x>

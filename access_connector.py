@@ -388,7 +388,6 @@ def get_table_by_filter(filter_product_by_name):
     query.execute(query_insert, (filter_product_by_name,))
     table = query.fetchall()
 
-        
     header = [description[0] for description in query.description]
 
     # ako query prodje u 'has_result' se zapise True, suprutno False
@@ -420,5 +419,36 @@ def show_table(table_id):
     
     return table_array, header
 
+def import_image(product_id, image_binary):
+    database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+    query = database_skladiste.cursor()
+    
+    update_query = '''
+        UPDATE proizvodi
+        SET privitak = ?
+        WHERE proizvod_id = ?
+    '''
+    query.execute(update_query, (image_binary, product_id))
+    query.commit()
+    
+    query.close()
+    database_skladiste.close()
+    
+def get_image(product_id):
+    database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+    query = database_skladiste.cursor()
+    
+    select_quert = '''
+        SELECT privitak
+        FROM proizvodi
+        WHERE proizvod_id = ?
+    '''
+    
+    query.execute(select_quert, (product_id))
+    image_binary = query.fetchone()
+    
+    
+    # print(image_binary[0])
+    return image_binary[0]
+    
 ''' testni dio za funkcije'''
-

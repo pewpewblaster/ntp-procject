@@ -15,8 +15,10 @@ from access_connector import (import_product,
                               update_product,
                               delete_product_by_id,
                               delete_warehouse_by_id,
-                              show_table)
-
+                              show_table,
+                              import_image,
+                              get_image)
+from show_image_form import Ui_Form
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow, selected_language, signed_user):
@@ -50,8 +52,6 @@ class Ui_MainWindow(object):
         self.table_filter_header = None
         
         
-
-
         ''' group box information - prikaz active language, active user, date, time '''
         self.group_box_information = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_information.setGeometry(QtCore.QRect(10, 10, 311, 71))
@@ -399,10 +399,12 @@ class Ui_MainWindow(object):
         self.button_select_picture.clicked.connect(self.load_picture)
         # privremena varijabla za 
         self.temp_blob_variable = None
-        
+        # button na klick otvara novu formu za prikaz slike
         self.button_save_picture = QtWidgets.QPushButton(parent=self.tab_picture_product)
         self.button_save_picture.setGeometry(QtCore.QRect(150, 80, 121, 23))
         self.button_save_picture.setObjectName("button_save_picture")
+        self.button_save_picture.clicked.connect(self.save_picture_to_database)
+        
         self.label_file_name = QtWidgets.QLabel(parent=self.tab_picture_product)
         self.label_file_name.setGeometry(QtCore.QRect(20, 110, 111, 20))
         self.label_file_name.setObjectName("label_file_name")
@@ -412,12 +414,13 @@ class Ui_MainWindow(object):
         self.label_show_picture_id = QtWidgets.QLabel(parent=self.tab_picture_product)
         self.label_show_picture_id.setGeometry(QtCore.QRect(20, 140, 251, 16))
         self.label_show_picture_id.setObjectName("label_show_picture_id")
-        self.lineEdit = QtWidgets.QLineEdit(parent=self.tab_picture_product)
-        self.lineEdit.setGeometry(QtCore.QRect(20, 170, 113, 20))
-        self.lineEdit.setObjectName("lineEdit")
+        self.edit_show_picture_id = QtWidgets.QLineEdit(parent=self.tab_picture_product)
+        self.edit_show_picture_id.setGeometry(QtCore.QRect(20, 170, 113, 20))
+        self.edit_show_picture_id.setObjectName("lineEdit")
         self.button_show_picture = QtWidgets.QPushButton(parent=self.tab_picture_product)
         self.button_show_picture.setGeometry(QtCore.QRect(150, 170, 121, 23))
         self.button_show_picture.setObjectName("button_show_picture")
+        self.button_show_picture.clicked.connect(self.show_picture)
         self.tab_products.addTab(self.tab_picture_product, "")
         
         MainWindow.setCentralWidget(self.centralwidget)
@@ -442,8 +445,20 @@ class Ui_MainWindow(object):
         self.tab_products.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-    ''' Custom funkcije  '''
 
+    ''' Custom funkcije  '''
+    def save_picture_to_database(self):
+        import_image(self.edit_add_picture_id.text(),
+                     self.temp_blob_variable)
+    
+    def show_picture(self):
+        self.temp_blob_variable = get_image(self.edit_show_picture_id.text())
+        self.main_window = QtWidgets.QMainWindow()
+        self.show_image_form = Ui_Form()
+        self.show_image_form.setupUi(self.main_window,
+                                     self.temp_blob_variable)
+        self.main_window.show()
+    
     def load_picture(self):
         file_dialog = QtWidgets.QFileDialog()
         file_dialog.setWindowTitle("Select Image")
@@ -452,9 +467,17 @@ class Ui_MainWindow(object):
         
         if file_dialog.exec() == QtWidgets.QFileDialog.DialogCode.Accepted:
             file_path = file_dialog.selectedFiles()[0]
-            self.temp_variable = file_path
-            file_name = file_dialog.selectedFiles()[0].split("/")[-1]
-            self.label_file_name_show.setText(file_name) 
+            file_name = file_path.split("/")[-1]
+            self.label_file_name_show.setText(file_name)
+            
+            # Convert the image to binary file
+            with open(file_path, 'rb') as image_file:
+                image_data = image_file.read()
+            self.temp_blob_variable = bytearray(image_data)
+            
+            print(f"lenght binary file: {len(self.temp_blob_variable)}")
+                
+        
     
     # funkcija koja se poziva kada se klikne na header tablice 'table_proizvodi' koja naknadno poziva funkciju
     # update table

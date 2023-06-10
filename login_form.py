@@ -89,9 +89,6 @@ class login_form(object):
 
     def login(self):
         if check_credentials(self.edit_username.text(), self.edit_password.text()):
-            global user
-            user = self.edit_username.text()
-            
             self.main_window = QtWidgets.QMainWindow()
             self.ui = Ui_MainWindow()
             self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
