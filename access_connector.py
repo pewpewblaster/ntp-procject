@@ -417,8 +417,16 @@ def show_table(table_id):
     query.close()
     database_skladiste.close()
     
+    # In the last element of the table_array list every character of the binadry file was showm in the table column
+    # That cousdet slow down in the program. Now that cell shows if product has an image or now with values "True" of "False"
+    
+    for table_element in table_array:
+        if table_element[-1] != None:
+            table_element[-1] = "True"
+        else:
+            table_element[-1] = "False"
+    
     return table_array, header
-
 def import_image(product_id, image_binary):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
@@ -437,18 +445,21 @@ def import_image(product_id, image_binary):
 def get_image(product_id):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
-    
+
     select_quert = '''
         SELECT privitak
         FROM proizvodi
         WHERE proizvod_id = ?
     '''
-    
+
     query.execute(select_quert, (product_id))
     image_binary = query.fetchone()
-    
-    
+    print(image_binary)
+    # if function fails to get the image, it returns valeu (None, )
+    if image_binary[0] is None:
+        return None
+
     # print(image_binary[0])
     return image_binary[0]
-    
+
 ''' testni dio za funkcije'''

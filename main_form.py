@@ -453,6 +453,10 @@ class Ui_MainWindow(object):
     
     def show_picture(self):
         self.temp_blob_variable = get_image(self.edit_show_picture_id.text())
+        if self.temp_blob_variable == None:
+            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", f"No image found for product ID: {self.edit_show_picture_id.text()}")
+            return
+
         self.main_window = QtWidgets.QMainWindow()
         self.show_image_form = Ui_Form()
         self.show_image_form.setupUi(self.main_window,
@@ -545,7 +549,7 @@ class Ui_MainWindow(object):
                 self.label_warehouse_information_name_show.setText(str(self.table_proizvodi_array[0][1]))
                 self.label_warehouse_information_street_show.setText(str(self.table_proizvodi_array[0][2]))
                 self.label_warehouse_information_city_show.setText(str(self.table_proizvodi_array[0][3]))
-                self.label_warehouse_information_country_show.setText(str(self.table_proizvodi_array[0][4]))    
+                self.label_warehouse_information_country_show.setText(str(self.table_proizvodi_array[0][4]))
         
     def table_show_data_filter(self):
         product_filter = self.edit_find_warehouse_by_product.text()
