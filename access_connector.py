@@ -407,7 +407,7 @@ def show_table(table_id):
         table = query.fetchall()
         header = [description[0] for description in query.description]
         table_array = [list(t) for t in table]
-    
+
     if table_id == "product":
         query.execute("SELECT * FROM proizvodi")
         table = query.fetchall()
@@ -416,21 +416,20 @@ def show_table(table_id):
 
     query.close()
     database_skladiste.close()
-    
-    # In the last element of the table_array list every character of the binadry file was showm in the table column
+
+    # In the last element of the table_array list every character of the binary file was showm in the table column
     # That cousdet slow down in the program. Now that cell shows if product has an image or now with values "True" of "False"
-    
     for table_element in table_array:
         if table_element[-1] != None:
             table_element[-1] = "True"
         else:
             table_element[-1] = "False"
-    
     return table_array, header
+
 def import_image(product_id, image_binary):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
-    
+
     update_query = '''
         UPDATE proizvodi
         SET privitak = ?
@@ -462,4 +461,84 @@ def get_image(product_id):
     # print(image_binary[0])
     return image_binary[0]
 
+    # function for getting product report data
+def get_product_data():
+
+    database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+
+    query = database_skladiste.cursor()
+    query.execute('SELECT naziv, cijena, kolicina, skladiste_id, kategorija FROM proizvodi')
+
+    product_data_dict = {}
+    for row in query:
+        naziv, cijena, kolicina, skladiste_id, kategorija = row
+        product_data_dict[naziv] = {
+            'cijena': cijena,
+            'kolicina': kolicina,
+            'skladiste_id': skladiste_id,
+            'kategorija': kategorija,
+        }
+
+    query.close()
+
+    return_code_success = 0 # return code if everything is okay
+    return_code_error = 404 # return code if dict is empty and there are no data, e.g. data not found
+
+    if bool(product_data_dict):
+        return return_code_success, product_data_dict
+    else:
+        return return_code_error
+
 ''' testni dio za funkcije'''
+import os
+from datetime import datetime
+return_code, data_dict = get_product_data()
+
+if return_code == 404:
+    print("There were no data in the database, process stoped!")
+
+rtf_report = "{\\rtf1\\ansi\n"
+
+sum_of_product = 0
+for product_key in data_dict:
+    product = data_dict[product_key]
+    cijena = product['cijena']
+    kolicina = product['kolicina']
+    sum_of_product += cijena + kolicina
+
+for product, value in data_dict.items():
+
+    cijena = value['cijena']
+    kolicina = value['kolicina']
+    skladiste_id = value['skladiste_id']
+    kategorija = value['kategorija']
+
+    # Format the data as per your requirements
+    rtf_report += f"{product}: \n"
+    rtf_report += f"Cijena: {cijena}\n"
+    rtf_report += f"Kolicina: {kolicina}\n"
+    rtf_report += f"Skladiste ID: {skladiste_id}\n"
+    rtf_report += f"Kategorija: {kategorija}\n\n"
+
+rtf_report += f"Ukupna iznos svih proizvoda iznosi: {sum_of_product} kn\n"
+rtf_report += "}"  # Closing tag for RTF docume
+print(rtf_report)
+
+# Get the current date and time
+current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+# Get the current directory of the main script
+current_directory = os.path.dirname(os.path.abspath(__file__))
+
+# Create the 'reports' directory if it doesn't exist
+reports_directory = os.path.join(current_directory, 'reports')
+if not os.path.exists(reports_directory):
+    os.makedirs(reports_directory)
+
+# Construct the filename with date and time
+filename = os.path.join(reports_directory, f"{current_datetime}_products.rtf")
+
+# Write the RTF content to the file
+with open(filename, 'w', encoding='utf-8') as rtf_file:
+    rtf_file.write(rtf_report)
+

@@ -17,22 +17,55 @@ from access_connector import (import_product,
                               delete_warehouse_by_id,
                               show_table,
                               import_image,
-                              get_image)
+                              get_image,
+                              get_product_data)
 from show_image_form import Ui_Form
+# modules for multithreading
+import concurrent.futures
+import threading
+import time
 
 class Ui_MainWindow(object):
+
+    class Report_Generator():
+
+        
+
+        # Function to fetch data needed to generate reports
+        def get_product_data(self):
+            pass
+        
+            
+        def get_warehouse_data(self):
+            pass
+        def get_images_data(self):
+            pass
+
+        # functions that generate reports:
+        # RTF report
+        def product_report(self):
+            pass
+        # RTF report
+        def warehouse_report(self):
+            pass
+        # PDF report
+        def picture_report(self):
+            pass
+
+
+
     def setupUi(self, MainWindow, selected_language, signed_user):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1300, 675)
         self.MainWindow = MainWindow
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        
+
         ''' '''
         self.selected_language = selected_language
         self.signed_user = signed_user
         print(f"From main_form.py class lang: {self.selected_language}, user: {self.signed_user} !!!")
-        
+
         ''' table table - prikazuje joinanu tablicu skladista i proizvodi po ID-u - lijeva tablica na GUIu '''
         self.table_proizvodi = QtWidgets.QTableWidget(parent=self.centralwidget)
         self.table_proizvodi.setGeometry(QtCore.QRect(30, 410, 691, 201))
@@ -43,15 +76,14 @@ class Ui_MainWindow(object):
         self.table_proizvodi.horizontalHeader().sectionClicked.connect(self.sort_table)
         self.sort_order = QtCore.Qt.SortOrder.AscendingOrder
         # liste u koju funkcija 'get_table' iz modula 'access_connector' sprema podatke o
-        # podatke tablici i headeru tablice 
+        # podatke tablici i headeru tablice
         self.table_proizvodi_array = None
         self.header = None
         # liste u koju funkcija 'get_table_by_filter' iz modula 'access_connector' sprema podatke o
         # podatke tablici i headeru tablice po unesenom filteru u edit box
         self.table_filter_array = None
         self.table_filter_header = None
-        
-        
+
         ''' group box information - prikaz active language, active user, date, time '''
         self.group_box_information = QtWidgets.QGroupBox(parent=self.centralwidget)
         self.group_box_information.setGeometry(QtCore.QRect(10, 10, 311, 71))
@@ -61,7 +93,7 @@ class Ui_MainWindow(object):
         self.label_active_language_show.setGeometry(QtCore.QRect(80, 40, 47, 21))
         self.label_active_language_show.setObjectName("label_active_language_show")
         self.label_active_language_show.setText(str(self.selected_language))
-        
+
         self.label_active_user = QtWidgets.QLabel(parent=self.group_box_information)
         self.label_active_user.setGeometry(QtCore.QRect(10, 20, 91, 21))
         self.label_active_user.setObjectName("label_active_user")

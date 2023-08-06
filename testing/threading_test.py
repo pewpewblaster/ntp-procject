@@ -1,16 +1,18 @@
 import concurrent.futures
 import threading
-import time
+import platform
 
 
 def job(message):
-    print(f"Processor name: {threading.current_thread().name}")
-    print(f"Thread number: {threading.get_ident()}")
+    processor = platform.processor()
+    thread_number = threading.get_ident()
+    print(f"Processor name: {processor}")
+    print(f"Thread number: {thread_number}")
     print(f"Job {message} completed")
 
 
 if __name__ == "__main__":
-    with concurrent.futures.ThreadPoolExecutor() as executor:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
         futures = [
             executor.submit(job, "Job 1"),
             executor.submit(job, "Job 2"),

@@ -15,7 +15,7 @@ class ApplicationSettings:
         self.font_size = None
         self.background_color = None
         self.font = None
-        
+
     def apply_settings(self):
         self.font_name = self.config.get('Theme', 'font')
         self.font_size = int(self.config.get('Theme', 'font_size'))
