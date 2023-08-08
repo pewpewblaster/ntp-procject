@@ -492,19 +492,14 @@ def get_product_data():
 ''' testni dio za funkcije'''
 import os
 from datetime import datetime
+
 return_code, data_dict = get_product_data()
 
 if return_code == 404:
-    print("There were no data in the database, process stoped!")
+    print("There were no data in the database, process stopped!")
 
 rtf_report = "{\\rtf1\\ansi\n"
-
 sum_of_product = 0
-for product_key in data_dict:
-    product = data_dict[product_key]
-    cijena = product['cijena']
-    kolicina = product['kolicina']
-    sum_of_product += cijena + kolicina
 
 for product, value in data_dict.items():
 
@@ -513,15 +508,18 @@ for product, value in data_dict.items():
     skladiste_id = value['skladiste_id']
     kategorija = value['kategorija']
 
-    # Format the data as per your requirements
-    rtf_report += f"{product}: \n"
-    rtf_report += f"Cijena: {cijena}\n"
-    rtf_report += f"Kolicina: {kolicina}\n"
-    rtf_report += f"Skladiste ID: {skladiste_id}\n"
-    rtf_report += f"Kategorija: {kategorija}\n\n"
+    sum_of_product += cijena * kolicina
 
-rtf_report += f"Ukupna iznos svih proizvoda iznosi: {sum_of_product} kn\n"
-rtf_report += "}"  # Closing tag for RTF docume
+    # Format the data as per your requirements
+    rtf_report += f"\line Naziv - {product}"
+    rtf_report += f"\line Kategorija - {kategorija}"
+    rtf_report += f"\line Cijena - {cijena} kn"
+    rtf_report += f"\line Kolicina: {kolicina}"
+    rtf_report += f"\line ID skladista: {skladiste_id}"
+    rtf_report += "\line"  # Add a blank line between products
+
+rtf_report += f"\line\line Ukupna iznos svih proizvoda iznosi: {sum_of_product} kn"
+rtf_report += "}"  # Closing tag for RTF document
 print(rtf_report)
 
 # Get the current date and time
