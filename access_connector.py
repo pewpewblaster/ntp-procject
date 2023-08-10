@@ -1,7 +1,6 @@
 import pyodbc
 
 # connector for user credenitals databse
-
 def user_database():
     connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/users.accdb;'
     database_users = pyodbc.connect(connection_string)
@@ -20,6 +19,7 @@ def user_database():
     # returns list with all usernames from databse users table credentials
     return users_list
 
+# function for deleting product by id
 def delete_product_by_id(product_id):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
@@ -53,6 +53,8 @@ def delete_product_by_id(product_id):
     database_skladiste.close()
     
     return True
+
+# function for deleting warehose by id
 def delete_warehouse_by_id(warehouse_id):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
@@ -87,6 +89,7 @@ def delete_warehouse_by_id(warehouse_id):
     
     return True
 
+# function for deleting user by id
 def delete_user_from_database(username_for_deletion):
     connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/users.accdb;'
     database_users = pyodbc.connect(connection_string)
@@ -200,7 +203,8 @@ def import_product(warehouse_id,
         database_skladiste.close()
 
         print("Product imported successfully.")
-        
+
+# function for 
 def import_warehouse(warehouse_name,
                      warehouse_address,
                      warehouse_city,
@@ -418,7 +422,7 @@ def show_table(table_id):
     database_skladiste.close()
 
     # In the last element of the table_array list every character of the binary file was showm in the table column
-    # That cousdet slow down in the program. Now that cell shows if product has an image or now with values "True" of "False"
+    # That coused slow downs in the program. Now that cell shows if product has an image or not with values "True" of "False"
     for table_element in table_array:
         if table_element[-1] != None:
             table_element[-1] = "True"
@@ -453,15 +457,17 @@ def get_image(product_id):
 
     query.execute(select_quert, (product_id))
     image_binary = query.fetchone()
-    print(image_binary)
+ 
     # if function fails to get the image, it returns valeu (None, )
-    if image_binary[0] is None:
+    if image_binary is None:
         return None
 
     # print(image_binary[0])
     return image_binary[0]
 
     # function for getting product report data
+
+# function that collects data for RTF report on product
 def get_product_data():
 
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
@@ -480,6 +486,7 @@ def get_product_data():
         }
 
     query.close()
+    database_skladiste.close()
 
     return_code_success = 0 # return code if everything is okay
     return_code_error = 404 # return code if dict is empty and there are no data, e.g. data not found
@@ -489,38 +496,83 @@ def get_product_data():
     else:
         return return_code_error
 
+def get_master_detail_data():
+    # Povezivanje s bazom
+    database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+    query = database_skladiste.cursor()
+    query.execute('''
+        SELECT s.skladiste_id, p.proizvod_id, p.naziv, p.cijena, p.kolicina, p.kategorija,
+               IIF(p.privitak IS NOT NULL, True, False) AS privitak
+        FROM [proizvodi] AS p
+        INNER JOIN [skladista] AS s ON p.skladiste_id = s.skladiste_id;
+    ''')
+
+    # Dohvaćanje rezultata i izgradnja dictionary strukture
+    master_detail = {}
+    for row in query.fetchall():
+        skladiste_id, proizvod_id, naziv, cijena, kolicina, kategorija, privitak = row
+        if skladiste_id not in master_detail:
+            master_detail[skladiste_id] = []
+        
+        proizvod = {
+            'skladiste_id': skladiste_id,
+            'proizvod_id': proizvod_id,
+            'naziv': naziv,
+            'cijena': cijena,
+            'kolicina': kolicina,
+            'kategorija': kategorija,
+            'privitak': privitak
+        }
+        master_detail[skladiste_id].append(proizvod)
+
+    # Zatvaranje veze s bazom
+    query.close()
+    database_skladiste.close()
+    
+    return_code_success = 0 # return code if everything is okay
+    return_code_error = 404 # return code if dict is empty and there are no data, e.g. data not found
+
+    if bool(master_detail):
+        return return_code_success, master_detail
+    else:
+        return return_code_error
+    
+
+
+###############################
 ''' testni dio za funkcije'''
+###############################
+
 import os
 from datetime import datetime
-
-return_code, data_dict = get_product_data()
-
-if return_code == 404:
-    print("There were no data in the database, process stopped!")
+return_code, master_detail_data = get_master_detail_data()
 
 rtf_report = "{\\rtf1\\ansi\n"
+
 sum_of_product = 0
+for key, products in master_detail_data.items():
+    rtf_report += f"Skladiste ID: {key} \line\line "
+    for product in products:
+        cijena = product['cijena']
+        kolicina = product['kolicina']
+        skladiste_id = product['skladiste_id']
+        kategorija = product['kategorija']
+        naziv = product['naziv']
+        privitak = product['privitak']
 
-for product, value in data_dict.items():
+        rtf_report += f"Naziv - {naziv} \line "
+        rtf_report += f"Kategorija - {kategorija} \line "
+        rtf_report += f"Cijena - {cijena} \line "
+        rtf_report += f"Kolicina: {kolicina} \line "
+        rtf_report += f"ID skladista: {skladiste_id} \line "
+        rtf_report += " \line "
 
-    cijena = value['cijena']
-    kolicina = value['kolicina']
-    skladiste_id = value['skladiste_id']
-    kategorija = value['kategorija']
-
-    sum_of_product += cijena * kolicina
-
-    # Format the data as per your requirements
-    rtf_report += f"\line Naziv - {product}"
-    rtf_report += f"\line Kategorija - {kategorija}"
-    rtf_report += f"\line Cijena - {cijena} kn"
-    rtf_report += f"\line Kolicina: {kolicina}"
-    rtf_report += f"\line ID skladista: {skladiste_id}"
-    rtf_report += "\line"  # Add a blank line between products
-
-rtf_report += f"\line\line Ukupna iznos svih proizvoda iznosi: {sum_of_product} kn"
+        sum_of_product += cijena * kolicina
+    rtf_report += " \line "
+    
+rtf_report += f"Ukupna iznos svih proizvoda iznosi: {sum_of_product} kn \line "
 rtf_report += "}"  # Closing tag for RTF document
-print(rtf_report)
+
 
 # Get the current date and time
 current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -529,7 +581,7 @@ current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 # Create the 'reports' directory if it doesn't exist
-reports_directory = os.path.join(current_directory, 'reports')
+reports_directory = os.path.join(current_directory, 'reports/master_detail_rtf')
 if not os.path.exists(reports_directory):
     os.makedirs(reports_directory)
 
