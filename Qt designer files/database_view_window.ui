@@ -1165,6 +1165,20 @@
    <property name="defaultUp">
     <bool>false</bool>
    </property>
+   <widget class="QMenu" name="menuOther_actions">
+    <property name="title">
+     <string>Other actions</string>
+    </property>
+    <widget class="QMenu" name="menuReports">
+     <property name="title">
+      <string>Reports</string>
+     </property>
+     <addaction name="actionShow_Report"/>
+     <addaction name="actionGenerate_reports"/>
+    </widget>
+    <addaction name="menuReports"/>
+   </widget>
+   <addaction name="menuOther_actions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionQuit">
@@ -1175,6 +1189,16 @@
   <action name="actionAdd_picture_to_product">
    <property name="text">
     <string>Add picture to product</string>
+   </property>
+  </action>
+  <action name="actionShow_Report">
+   <property name="text">
+    <string>Show Report</string>
+   </property>
+  </action>
+  <action name="actionGenerate_reports">
+   <property name="text">
+    <string>Generate reports</string>
    </property>
   </action>
  </widget>
