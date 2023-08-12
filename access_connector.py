@@ -55,6 +55,40 @@ def delete_product_by_id(product_id):
     return True
 
 # function for deleting warehose by id
+# def delete_warehouse_by_id(warehouse_id):
+#     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+#     query = database_skladiste.cursor()
+    
+#     select_query = '''
+#         SELECT *
+#         FROM skladista
+#         WHERE skladiste_id = ?
+#     '''
+#     query.execute(select_query, (warehouse_id,))
+    
+#     result = query.fetchone() # (1, 'Skladiste 1', '123 Main St', 'New York', 'USA')
+    
+#     # ako ne postoji skladiste sa trazenim skladiste_id
+#     if not result:
+#         query.close()
+#         database_skladiste.close()
+#         print(f"Ne postji skladsite sa id: {warehouse_id}!")
+#         return False
+
+    
+#     delete_query = '''
+#             DELETE FROM skladista
+#             WHERE skladiste_id = ?
+#         '''
+
+#     query.execute(delete_query, (warehouse_id,))
+#     query.commit()
+
+#     query.close()
+#     database_skladiste.close()
+    
+#     return True
+
 def delete_warehouse_by_id(warehouse_id):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
@@ -66,28 +100,41 @@ def delete_warehouse_by_id(warehouse_id):
     '''
     query.execute(select_query, (warehouse_id,))
     
-    result = query.fetchone() # (1, 'Skladiste 1', '123 Main St', 'New York', 'USA')
+    result = query.fetchone()  # (1, 'Skladiste 1', '123 Main St', 'New York', 'USA')
     
-    # ako ne postoji skladiste sa trazenim skladiste_id
+    # If the warehouse with the given ID doesn't exist
     if not result:
         query.close()
         database_skladiste.close()
-        print(f"Ne postji skladsite sa id: {warehouse_id}!")
+        print(f"Ne postoji skladiste sa id: {warehouse_id}!")
         return False
-
     
-    delete_query = '''
-            DELETE FROM skladista
-            WHERE skladiste_id = ?
-        '''
+    # Retrieve the related proizvod_id before deleting the warehouse
+    proizvod_id_to_delete = result[0]  # Assuming the first column is proizvod_id
 
-    query.execute(delete_query, (warehouse_id,))
-    query.commit()
+    delete_query_proizvod = '''
+        DELETE FROM proizvodi
+        WHERE skladiste_id = ?
+    '''
+    delete_query_skladiste = '''
+        DELETE FROM skladista
+        WHERE skladiste_id = ?
+    '''
 
-    query.close()
-    database_skladiste.close()
-    
-    return True
+    try:
+        query.execute(delete_query_proizvod, (warehouse_id,))
+        query.execute(delete_query_skladiste, (warehouse_id,))
+        query.commit()
+        print(f"Skladiste sa id {warehouse_id} i pripadajući proizvodi su uspješno obrisani.")
+        return True
+    except Exception as e:
+        query.rollback()
+        print(f"Greška prilikom brisanja: {e}")
+        return False
+    finally:
+        query.close()
+        database_skladiste.close()
+
 
 # function for deleting user by id
 def delete_user_from_database(username_for_deletion):
@@ -487,14 +534,8 @@ def get_product_data():
 
     query.close()
     database_skladiste.close()
-
-    return_code_success = 0 # return code if everything is okay
-    return_code_error = 404 # return code if dict is empty and there are no data, e.g. data not found
-
-    if bool(product_data_dict):
-        return return_code_success, product_data_dict
-    else:
-        return return_code_error
+    
+    return product_data_dict
 
 def get_master_detail_data():
     # Povezivanje s bazom
@@ -529,66 +570,87 @@ def get_master_detail_data():
     query.close()
     database_skladiste.close()
     
-    return_code_success = 0 # return code if everything is okay
-    return_code_error = 404 # return code if dict is empty and there are no data, e.g. data not found
+    return master_detail
 
-    if bool(master_detail):
-        return return_code_success, master_detail
-    else:
-        return return_code_error
+def get_image_for_pdf():
     
+    database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+    query = database_skladiste.cursor()
+    query.execute('SELECT privitak FROM proizvodi WHERE privitak IS NOT NULL')
+    rows = query.fetchall()
+    
+    query.close()
+    database_skladiste.close()
+    
+    return rows
+
 
 
 ###############################
 ''' testni dio za funkcije'''
 ###############################
-
+import PIL.Image as Image
+from io import BytesIO
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Image, Spacer
 import os
 from datetime import datetime
-return_code, master_detail_data = get_master_detail_data()
 
-rtf_report = "{\\rtf1\\ansi\n"
+if __name__ == "__main__":
+    data_dict = get_product_data()
 
-sum_of_product = 0
-for key, products in master_detail_data.items():
-    rtf_report += f"Skladiste ID: {key} \line\line "
-    for product in products:
-        cijena = product['cijena']
-        kolicina = product['kolicina']
-        skladiste_id = product['skladiste_id']
-        kategorija = product['kategorija']
-        naziv = product['naziv']
-        privitak = product['privitak']
+    sum_of_product = 0
+    count_of_name_product = 0
+    count_of_product = 0
+    date_of_report = datetime.now().strftime("%Y-%m-%d")
 
-        rtf_report += f"Naziv - {naziv} \line "
-        rtf_report += f"Kategorija - {kategorija} \line "
-        rtf_report += f"Cijena - {cijena} \line "
-        rtf_report += f"Kolicina: {kolicina} \line "
-        rtf_report += f"ID skladista: {skladiste_id} \line "
-        rtf_report += " \line "
+    rtf_report = "{\\rtf1\\ansi\n"
+    rtf_report += "RTF report - baza skladiste - tablica proizvodi "
+    rtf_report += f"\line Datum izvjestaja: {date_of_report} \line "
+    rtf_report += " \line Ispis svih proizvoda i njegovih karakteristika \line"
+    rtf_report += "-------------------------------------------------------- "
+    
+    for product, value in data_dict.items():
+        count_of_name_product += 1
+        
+        cijena = value['cijena']
+        kolicina = value['kolicina']
+        skladiste_id = value['skladiste_id']
+        kategorija = value['kategorija']
 
         sum_of_product += cijena * kolicina
-    rtf_report += " \line "
-    
-rtf_report += f"Ukupna iznos svih proizvoda iznosi: {sum_of_product} kn \line "
-rtf_report += "}"  # Closing tag for RTF document
+        count_of_product += kolicina
+        
+        # Format the data as per your requirements
+        rtf_report += f"\line Naziv - {product}"
+        rtf_report += f"\line Kategorija - {kategorija}"
+        rtf_report += f"\line Cijena - {cijena} kn"
+        rtf_report += f"\line Kolicina: {kolicina}"
+        rtf_report += f"\line ID skladista: {skladiste_id}"
+        rtf_report += "\line"  # Add a blank line between products
 
+    rtf_report += "-------------------------------------------------------- \line"
+    rtf_report += f"\line Ukupni iznos svih proizvoda iznosi: {sum_of_product} kn."
+    rtf_report += f"\line Ukupno stavki: {count_of_name_product}."
+    rtf_report += f"\line Ukupno proizvoda: {count_of_product} kom."
 
-# Get the current date and time
-current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    rtf_report += "}"  # Closing tag for RTF document
+    print(rtf_report)
 
-# Get the current directory of the main script
-current_directory = os.path.dirname(os.path.abspath(__file__))
+    # Get the current date and time
+    current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
-# Create the 'reports' directory if it doesn't exist
-reports_directory = os.path.join(current_directory, 'reports/master_detail_rtf')
-if not os.path.exists(reports_directory):
-    os.makedirs(reports_directory)
+    # Get the current directory of the main script
+    current_directory = os.path.dirname(os.path.abspath(__file__))
 
-# Construct the filename with date and time
-filename = os.path.join(reports_directory, f"{current_datetime}_products.rtf")
+    # Create the 'reports' directory if it doesn't exist
+    reports_directory = os.path.join(current_directory, 'reports/products_rtf')
+    if not os.path.exists(reports_directory):
+        os.makedirs(reports_directory)
 
-# Write the RTF content to the file
-with open(filename, 'w', encoding='utf-8') as rtf_file:
-    rtf_file.write(rtf_report)
+    # Construct the filename with date and time
+    filename = os.path.join(reports_directory, f"{current_datetime}_products.rtf")
 
+    # Write the RTF content to the file
+    with open(filename, 'w', encoding='utf-8') as rtf_file:
+        rtf_file.write(rtf_report)

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1300</width>
-    <height>675</height>
+    <height>863</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1149,6 +1149,45 @@
      </widget>
     </widget>
    </widget>
+   <widget class="QGroupBox" name="group_box_reports">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>630</y>
+      <width>171</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Reports</string>
+    </property>
+    <widget class="QPushButton" name="button_generate_reports">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>60</y>
+       <width>131</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Generate reports</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="button_show_reports">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>30</y>
+       <width>131</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Show reports</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="enabled">
@@ -1192,6 +1231,9 @@
    </property>
   </action>
   <action name="actionShow_Report">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Show Report</string>
    </property>
