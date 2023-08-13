@@ -1,50 +1,74 @@
 import threading
+import concurrent.futures
 import time
 
-# Inicijalizacija objekta Lock
-time_lock = threading.Lock()
+class MultithreadedExecutor:
+    def __init__(self, num_threads=4):
+        self.num_threads = num_threads
+        self.thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=num_threads)
+        self.results = []
+        self.times = []
 
-# Globalna varijabla koja predstavlja trenutno vrijeme
-current_time = 0
+    def execute_functions(self, *functions):
+        with self.thread_pool as executor:
+            futures = []
+            start_time = time.time()
+            for func in functions:
+                future = executor.submit(self._execute_function_with_time, func)
+                futures.append(future)
+            for future in concurrent.futures.as_completed(futures):
+                result, elapsed_time, thread_name, end_time = future.result()
+                self.results.append(result)
+                self.times.append(elapsed_time)
+                print(f"Thread {thread_name} executed {func.__name__}")
+                print(f"Thread {thread_name} ended at {end_time}")
+            end_time = time.time()
+            self.total_time = max(self.times)  # Set total time to the longest-running function time
 
-def update_time(new_time):
-    global current_time
+    def get_results(self):
+        return self.results
 
-    # Zaključavanje
-    time_lock.acquire()
+    def get_times(self):
+        return self.times
 
-    try:
-        # Provjera i ažuriranje vremena samo ako je novo vrijeme veće od trenutnog
-        if new_time > current_time:
-            print("Ažuriranje vremena:", new_time)
-            current_time = new_time
-        else:
-            print("Novo vrijeme je manje od trenutnog. Neće se ažurirati.")
-    finally:
-        # Otključavanje
-        time_lock.release()
+    def get_total_time(self):
+        return self.total_time
 
-def main():
-    # Simulacija generiranja ažuriranja vremena iz različitih dretvi
-    threads = []
-    for i in range(5):
-        # Generiranje nasumičnog vremena
-        new_time = i * 10
+    def _execute_function_with_time(self, func):
+        start_time = time.time()
+        thread_name = threading.current_thread().name
+        result = func()
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        return result, elapsed_time, thread_name, end_time
 
-        # Stvaranje threada i dodavanje u listu
-        thread = threading.Thread(target=update_time, args=(new_time,))
-        threads.append(thread)
 
-    # Pokretanje threadova
-    for thread in threads:
-        thread.start()
+# Example user-created functions
+def func1():
+    time.sleep(2)  # Simulate some work
+    return "Function 1 executed"
 
-    # Čekanje da se svi threadovi završe
-    for thread in threads:
-        thread.join()
+def func2():
+    time.sleep(3)  # Simulate some work
+    return "Function 2 executed"
 
-    # Ispis konačnog vremena
-    print("Konačno vrijeme:", current_time)
+def func3():
+    time.sleep(1)  # Simulate some work
+    return "Function 3 executed"
 
-if __name__ == "__main__":
-    main()
+# Create an instance of MultithreadedExecutor
+executor = MultithreadedExecutor()
+
+# Execute user-created functions using multithreading
+executor.execute_functions(func1, func2, func3)
+
+# Get the results and execution times
+results = executor.get_results()
+times = executor.get_times()
+total_time = executor.get_total_time()
+
+for idx, (result, elapsed_time) in enumerate(zip(results, times)):
+    print(f"Function {idx + 1} result: {result}")
+    print(f"Function {idx + 1} execution time: {elapsed_time:.4f} seconds")
+
+print(f"Total execution time: {total_time:.4f} seconds")

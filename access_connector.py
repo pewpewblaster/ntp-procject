@@ -595,58 +595,79 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from PIL import Image
 from datetime import datetime
+import threading
+import time
+import concurrent.futures
 
 if __name__ == "__main__":
     
-    rows = get_image_for_pdf()
-    
-    output_directory = "reports/image_pdf_reports.pdf"
-    
-    # Create the output directory if it doesn't exist
-    if not os.path.exists(output_directory):
-        os.makedirs(output_directory)
+    # Mock functions for demonstration purposes
+    def get_product_data(num_loops):
+        for _ in range(num_loops):
+            time.sleep(0.1)
+        print("Got product data")
 
-    pdf_filename = os.path.join(output_directory, f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_image_report_PDF.pdf")
-    c = canvas.Canvas(pdf_filename, pagesize = A4)
-    
-    # Add the title and date at the beginning of the PDF
-    title = "PDF izvjestaj slika iz tablice proizvodi"
-    current_date = "Datum: 2023-08-13"  # Replace this with the actual current date
-    
-    c.setFont("Helvetica-Bold", 14)
-    c.drawString(100, A4[1] - 50, title)
-    c.setFont("Helvetica", 12)
-    c.drawString(100, A4[1] - 70, current_date)
-    
-    y_position = A4[1] - 100
-    
-    for index, (product_name, image_data) in enumerate(rows):
-        # Save the image data to a temporary file
-        temp_image_path = f"temp_image_{index}.jpg"
-        with open(temp_image_path, 'wb') as temp_image_file:
-            temp_image_file.write(image_data)
-        
-        image = Image.open(temp_image_path)
-        
-        # Scale the image while maintaining its aspect ratio
-        max_width = 400  # Adjust as needed
-        max_height = 300  # Adjust as needed
-        image.thumbnail((max_width, max_height))
-        
-        # Draw product name
-        c.setFont("Helvetica-Bold", 12)
-        c.drawString(100, y_position, product_name)
-        y_position -= 20
-        
-        # Draw image
-        img_width, img_height = image.size
-        c.drawImage(temp_image_path, 100, y_position - img_height, width=img_width, height=img_height)
-        y_position -= img_height + 20
-        
-        # Close the image
-        image.close()
-        
-        # Delete the temporary image file
-        os.remove(temp_image_path)
-    
-    c.save()
+    def get_master_detail_data(num_loops):
+        for _ in range(num_loops):
+            time.sleep(0.1)
+        print("Got master-detail data")
+
+    def get_image_for_pdf(num_loops):
+        for _ in range(num_loops):
+            time.sleep(0.1)
+        print("Got image for PDF")
+
+    def concurrency_test(func):
+        start = time.time()
+        threads = []
+        for _ in range(3):
+            thread = threading.Thread(target=func, args=(100,))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        end = time.time()
+        delta_time = end - start
+        print(f"{func.__name__} Concurrency:", delta_time)
+
+    def parallelism_test(func):
+        start = time.time()
+        threads = []
+        for _ in range(3):
+            thread = threading.Thread(target=func, args=(100,))
+            thread.daemon = True
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()
+
+        end = time.time()
+        delta_time = end - start
+        print(f"{func.__name__} Parallelism:", delta_time)
+
+    def threadpool_test(func):
+        start = time.time()
+        executor = concurrent.futures.ThreadPoolExecutor(max_workers=3)
+        tasks = [executor.submit(func, 100) for _ in range(3)]
+
+        for task in tasks:
+            task.result()
+
+        end = time.time()
+        delta_time = end - start
+        print(f"{func.__name__} ThreadPool:", delta_time)
+
+    def main():
+        functions_to_test = [get_product_data, get_master_detail_data, get_image_for_pdf]
+
+        for func in functions_to_test:
+            for _ in range(10):
+                print(f"Testing {func.__name__}")
+                concurrency_test(func)
+                parallelism_test(func)
+                threadpool_test(func)
+                print("-" * 40)
+

@@ -1,59 +1,62 @@
-import sys
-import json
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QTextBrowser, QLabel
+import threading
+import time
+import concurrent.futures
 
-class TextBrowserWidget(object):
+def load_heavy_task(num_loops):
+    for _ in range(num_loops):
+        time.sleep(0.1)
 
-    def setupUI(self):
-        layout = QVBoxLayout()
+def concurrency_test():
+    start = time.time()
+    threads = []
+    for _ in range(3):
+        thread = threading.Thread(target=load_heavy_task, args=(100,))
+        threads.append(thread)
+        thread.start()
 
-        label1 = QLabel("Table Product Report", self)
-        self.text_browser1 = QTextBrowser(self)
+    for thread in threads:
+        thread.join()
 
-        label2 = QLabel("Table Warehouse-Product Report", self)
-        self.text_browser2 = QTextBrowser(self)
+    end = time.time()
+    delta_time = end - start
+    print("Concurrency:", delta_time)
 
-        layout.addWidget(label1)
-        layout.addWidget(self.text_browser1)
-        layout.addWidget(label2)
-        layout.addWidget(self.text_browser2)
+def parallelism_test():
+    start = time.time()
+    threads = []
+    for _ in range(3):
+        thread = threading.Thread(target=load_heavy_task, args=(100,))
+        thread.daemon = True
+        threads.append(thread)
+        thread.start()
 
-        self.setLayout(layout)
-        self.setGeometry(100, 100, 800, 600)
-        self.setWindowTitle('Text Browser Widget')
+    for thread in threads:
+        thread.join()
 
-        # Example content for text browsers
-        self.text_browser2.setPlainText("This is Text Browser 2.")
+    end = time.time()
+    delta_time = end - start
+    print("Parallelism:", delta_time)
 
-        # Display the dictionary in the first text browser
-        data_dict = {
-            "glossary": {
-                "title": "example glossary",
-                "GlossDiv": {
-                    "title": "S",
-                    "GlossList": {
-                        "GlossEntry": {
-                            "ID": "SGML",
-                            "SortAs": "SGML",
-                            "GlossTerm": "Standard Generalized Markup Language",
-                            "Acronym": "SGML",
-                            "Abbrev": "ISO 8879:1986",
-                            "GlossDef": {
-                                "para": "A meta-markup language, used to create markup languages such as DocBook.",
-                                "GlossSeeAlso": ["GML", "XML"]
-                            },
-                            "GlossSee": "markup"
-                        }
-                    }
-                }
-            }
-        }
+def threadpool_test():
+    start = time.time()
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=3)
+    tasks = [executor.submit(load_heavy_task, 100) for _ in range(3)]
 
-        json_string = json.dumps(data_dict, indent=4)
-        self.text_browser1.setPlainText(json_string)
+    for task in tasks:
+        task.result()
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = TextBrowserWidget()
-    window.show()
-    sys.exit(app.exec())
+    end = time.time()
+    delta_time = end - start
+    print("ThreadPool:", delta_time)
+
+def main():
+    i = 0
+    for _ in range(10):
+        print(i)
+        i += 1
+        concurrency_test()
+        parallelism_test()
+        threadpool_test()
+
+if __name__ == "__main__":
+    main()

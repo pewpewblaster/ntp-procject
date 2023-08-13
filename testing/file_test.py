@@ -1,34 +1,47 @@
-import os
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel
-from PyQt6.QtGui import QPixmap
+import time
+from concurrent.futures import ThreadPoolExecutor
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
+class MyThreadPool:
+    """A multithreading class that uses ThreadPoolExecutor."""
 
-        # Create a QLabel widget to display the image
-        self.image_label = QLabel(self)
-        self.setCentralWidget(self.image_label)
+    def __init__(self, num_threads=4):
+        """Initialize the class with the number of threads."""
+        self.num_threads = num_threads
+        self.thread_pool = ThreadPoolExecutor(max_workers=num_threads)
 
-        # Set the image
-        current_directory = os.path.dirname(os.path.abspath(__file__))
-        image_path = os.path.join(current_directory, "image.jpg")
-        self.set_image(image_path)
+    def run_jobs(self, jobs):
+        """Run the jobs in the thread pool."""
+        start_time = time.time()
+        results = list(self.thread_pool.map(jobs))
+        end_time = time.time()
+        delta_time = end_time - start_time
+        print(f"Delta time: {delta_time}")
+        return results
 
-    def set_image(self, image_path):
-        # Load the image using QPixmap
-        pixmap = QPixmap(image_path)
+    def add_job(self, job):
+        """Add a job to the thread pool."""
+        self.thread_pool.submit(job)
 
-        # Check if the image was loaded successfully
-        if pixmap.isNull():
-            print("Error loading image")
-            return
+def my_job(name):
+    """A simple job that prints the name."""
+    print(f"Hello, {name}")
+    time.sleep(1)
+    return name
 
-        # Set the pixmap as the content of the QLabel
-        self.image_label.setPixmap(pixmap)
-        self.image_label.setScaledContents(True)  # Scale the image to fit the label
+def main():
+    """The main function."""
+    # Create a thread pool with 4 threads.
+    pool = MyThreadPool(num_threads=4)
 
-app = QApplication([])
-window = MainWindow()
-window.show()
-app.exec()
+    # Create a list of jobs.
+    jobs = [lambda: my_job("Alice"), lambda: my_job("Bob"), lambda: my_job("Carol")]
+
+    # Run the jobs in the thread pool.
+    results = pool.run_jobs(jobs)
+
+    # Print the results.
+    for name in results:
+        print(name)
+
+if __name__ == "__main__":
+    main()

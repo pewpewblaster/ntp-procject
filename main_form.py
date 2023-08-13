@@ -31,6 +31,9 @@ from datetime import datetime
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from PIL import Image # for image handling in function "def get_image_data(self)"
+# imports for multithreading
+import time
+import concurrent.futures
 
 class Ui_MainWindow(object):
 
@@ -87,8 +90,6 @@ class Ui_MainWindow(object):
                 rtf_report += f"Ukupno proizvoda: {total_products} kom. \line "
                 rtf_report += "}"
 
-                print(rtf_report)
-
                 # Get the current date and time
                 current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
@@ -108,7 +109,7 @@ class Ui_MainWindow(object):
                     rtf_file.write(rtf_report)
                 
                 self.product_data = rtf_report
-            
+
         # function to fetch data and generate master detail report in RTF
         def get_master_detail_data(self, type_of_request):
             data_dict = get_master_detail_data()
@@ -200,17 +201,18 @@ class Ui_MainWindow(object):
 
                 c.save()
                 self.master_detail_data = filename
-        
+        # functions that fetches data from database and generates PDF report of images
         def get_image_data(self):
+            
             rows = get_image_for_pdf()
     
-            output_directory = "reports/image_pdf_reports.pdf"
+            output_directory = "reports/image_pdf_reports"
             
             # Create the output directory if it doesn't exist
             if not os.path.exists(output_directory):
                 os.makedirs(output_directory)
 
-            pdf_filename = os.path.join(output_directory, f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_image_report_PDF.pdf")
+            pdf_filename = os.path.join(output_directory, f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_image_report.pdf")
             c = canvas.Canvas(pdf_filename, pagesize = A4)
             
             # Add the title and date at the beginning of the PDF
@@ -254,17 +256,31 @@ class Ui_MainWindow(object):
                 os.remove(temp_image_path)
             
             c.save()
+
+    class ParallelTaskExecutor:
+        def __init__(self, max_workers):
+            self.max_workers = max_workers
+            self.executor = concurrent.futures.ThreadPoolExecutor(self.max_workers)
         
-        def product_report(self):
-            pass
-        # RTF report
-        def warehouse_report(self):
-            pass
-        # PDF report
-        def picture_report(self):
-            pass
-
-
+        def _run_task(self, task_func):
+            task_name = task_func.__name__
+            print(f"{task_name} started at {datetime.now().strftime('%H:%M:%S.%f')}")
+            start_time = time.time()
+            task_func()
+            end_time = time.time()
+            print(f"{task_name} finished at {datetime.now().strftime('%H:%M:%S.%f')}, Duration: {end_time - start_time:.2f} seconds")
+        
+        def run_tasks(self, tasks):
+            future_results = []
+            for task in tasks:
+                future = self.executor.submit(self._run_task, task)
+                future_results.append(future)
+            
+            concurrent.futures.wait(future_results)
+        
+        def shutdown(self):
+            self.executor.shutdown()
+        
     def setupUi(self, MainWindow, selected_language, signed_user):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1300, 863)
@@ -698,13 +714,24 @@ class Ui_MainWindow(object):
         # functions take additional argument "show", to only show report to the user
         # if that arguments was something else reports would be generated and saved localy
         # inside the project folder "reports/*"
-        self.report_generator_data.get_product_data(self, "generate")
-        self.report_generator_data.get_master_detail_data(self, "generate")
-        self.report_generator_data.get_image_data(self)
+        """signle thread"""
+        # self.report_generator_data.get_product_data(self, "generate")
+        # self.report_generator_data.get_master_detail_data(self, "generate")
+        # self.report_generator_data.get_image_data(self)
         QtWidgets.QMessageBox.information(self.MainWindow,
                                        "Reports generated successfully",
                                        "Reports are saved inside folder 'reprots'.")
+        self.report_generator_data = Ui_MainWindow.Report_Generator
 
+        number_of_threads = 4
+        self.threadpool = Ui_MainWindow.ParallelTaskExecutor(number_of_threads)
+        list_of_tasks = [lambda: self.report_generator_data.get_product_data(self, "generate"),
+                         lambda: self.report_generator_data.get_master_detail_data(self, "generate"),
+                         lambda: self.report_generator_data.get_image_data(self)]
+        
+        self.threadpool.run_tasks(list_of_tasks)
+        self.threadpool.shutdown()
+        
     # function related to button self.button_show_reports
     # on click calls widget report_form.py that shows databse reports
     def show_report_form(self):
