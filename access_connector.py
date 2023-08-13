@@ -576,81 +576,77 @@ def get_image_for_pdf():
     
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
-    query.execute('SELECT privitak FROM proizvodi WHERE privitak IS NOT NULL')
+    query.execute('SELECT naziv, privitak FROM proizvodi WHERE privitak IS NOT NULL')
     rows = query.fetchall()
     
     query.close()
     database_skladiste.close()
-    
     return rows
+
 
 
 
 ###############################
 ''' testni dio za funkcije'''
 ###############################
-import PIL.Image as Image
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Image, Spacer
 import os
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from PIL import Image
 from datetime import datetime
 
 if __name__ == "__main__":
-    data_dict = get_product_data()
-
-    sum_of_product = 0
-    count_of_name_product = 0
-    count_of_product = 0
-    date_of_report = datetime.now().strftime("%Y-%m-%d")
-
-    rtf_report = "{\\rtf1\\ansi\n"
-    rtf_report += "RTF report - baza skladiste - tablica proizvodi "
-    rtf_report += f"\line Datum izvjestaja: {date_of_report} \line "
-    rtf_report += " \line Ispis svih proizvoda i njegovih karakteristika \line"
-    rtf_report += "-------------------------------------------------------- "
     
-    for product, value in data_dict.items():
-        count_of_name_product += 1
+    rows = get_image_for_pdf()
+    
+    output_directory = "reports/image_pdf_reports.pdf"
+    
+    # Create the output directory if it doesn't exist
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+
+    pdf_filename = os.path.join(output_directory, f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_image_report_PDF.pdf")
+    c = canvas.Canvas(pdf_filename, pagesize = A4)
+    
+    # Add the title and date at the beginning of the PDF
+    title = "PDF izvjestaj slika iz tablice proizvodi"
+    current_date = "Datum: 2023-08-13"  # Replace this with the actual current date
+    
+    c.setFont("Helvetica-Bold", 14)
+    c.drawString(100, A4[1] - 50, title)
+    c.setFont("Helvetica", 12)
+    c.drawString(100, A4[1] - 70, current_date)
+    
+    y_position = A4[1] - 100
+    
+    for index, (product_name, image_data) in enumerate(rows):
+        # Save the image data to a temporary file
+        temp_image_path = f"temp_image_{index}.jpg"
+        with open(temp_image_path, 'wb') as temp_image_file:
+            temp_image_file.write(image_data)
         
-        cijena = value['cijena']
-        kolicina = value['kolicina']
-        skladiste_id = value['skladiste_id']
-        kategorija = value['kategorija']
-
-        sum_of_product += cijena * kolicina
-        count_of_product += kolicina
+        image = Image.open(temp_image_path)
         
-        # Format the data as per your requirements
-        rtf_report += f"\line Naziv - {product}"
-        rtf_report += f"\line Kategorija - {kategorija}"
-        rtf_report += f"\line Cijena - {cijena} kn"
-        rtf_report += f"\line Kolicina: {kolicina}"
-        rtf_report += f"\line ID skladista: {skladiste_id}"
-        rtf_report += "\line"  # Add a blank line between products
-
-    rtf_report += "-------------------------------------------------------- \line"
-    rtf_report += f"\line Ukupni iznos svih proizvoda iznosi: {sum_of_product} kn."
-    rtf_report += f"\line Ukupno stavki: {count_of_name_product}."
-    rtf_report += f"\line Ukupno proizvoda: {count_of_product} kom."
-
-    rtf_report += "}"  # Closing tag for RTF document
-    print(rtf_report)
-
-    # Get the current date and time
-    current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-
-    # Get the current directory of the main script
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-
-    # Create the 'reports' directory if it doesn't exist
-    reports_directory = os.path.join(current_directory, 'reports/products_rtf')
-    if not os.path.exists(reports_directory):
-        os.makedirs(reports_directory)
-
-    # Construct the filename with date and time
-    filename = os.path.join(reports_directory, f"{current_datetime}_products.rtf")
-
-    # Write the RTF content to the file
-    with open(filename, 'w', encoding='utf-8') as rtf_file:
-        rtf_file.write(rtf_report)
+        # Scale the image while maintaining its aspect ratio
+        max_width = 400  # Adjust as needed
+        max_height = 300  # Adjust as needed
+        image.thumbnail((max_width, max_height))
+        
+        # Draw product name
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(100, y_position, product_name)
+        y_position -= 20
+        
+        # Draw image
+        img_width, img_height = image.size
+        c.drawImage(temp_image_path, 100, y_position - img_height, width=img_width, height=img_height)
+        y_position -= img_height + 20
+        
+        # Close the image
+        image.close()
+        
+        # Delete the temporary image file
+        os.remove(temp_image_path)
+    
+    c.save()

@@ -5,23 +5,27 @@ from datetime import datetime
 class Report_Form(object):
     def setupUi(self, Form, product_data, master_detail_data):
         Form.setObjectName("Reprot Form")
-        Form.resize(715, 490)
+        Form.resize(640, 801)
         
         self.product_data = product_data
         self.master_detail_data = master_detail_data
         
         self.label_product = QtWidgets.QLabel(parent=Form)
-        self.label_product.setGeometry(QtCore.QRect(20, 10, 671, 31))
+        self.label_product.setGeometry(QtCore.QRect(20, 10, 600, 31))
         self.label_product.setObjectName("label_product")
         self.textBrowser_product = QtWidgets.QTextBrowser(parent=Form)
-        self.textBrowser_product.setGeometry(QtCore.QRect(20, 40, 671, 192))
+        self.textBrowser_product.setGeometry(QtCore.QRect(20, 40, 601, 351))
         self.textBrowser_product.setObjectName("textBrowser_product")
         self.textBrowser_warehouse_product = QtWidgets.QTextBrowser(parent=Form)
-        self.textBrowser_warehouse_product.setGeometry(QtCore.QRect(20, 280, 671, 192))
+        self.textBrowser_warehouse_product.setGeometry(QtCore.QRect(20, 430, 601, 351))
         self.textBrowser_warehouse_product.setObjectName("textBrowser_warehouse_product")
         self.label_warehouse_product = QtWidgets.QLabel(parent=Form)
-        self.label_warehouse_product.setGeometry(QtCore.QRect(20, 240, 661, 31))
+        self.label_warehouse_product.setGeometry(QtCore.QRect(20, 400, 661, 31))
         self.label_warehouse_product.setObjectName("label_warehouse_product")
+
+        # for both text browsers set scroll bar at the start/top
+        self.textBrowser_warehouse_product.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
+        
 
         data_dict = {
             "glossary": {
@@ -104,7 +108,6 @@ class Report_Form(object):
 
             for skladiste_id, products in self.master_detail_data.items():
                 self.textBrowser_warehouse_product.append(f"Skladiste ID: {skladiste_id}\n")
-
                 for product in products:
                     product_name = product["naziv"]
                     product_category = product["kategorija"]
@@ -123,14 +126,14 @@ class Report_Form(object):
                         f"Cijena - {product_price}\n"
                         f"Kolicina: {product_quantity}\n"
                         f"ID skladišta: {skladiste_id}\n"
-                        f"Sadrzi privitak: {attachment_text}\n\n"
+                        f"Sadrzi privitak: {attachment_text}\n"
                     )
                     self.textBrowser_warehouse_product.append(text_to_append)
                     
                 self.textBrowser_warehouse_product.append(f"\nStatistika za skladiste ID: {skladiste_id}")
                 self.textBrowser_warehouse_product.append(f"Ukupni iznos svih proizvoda iznosi: {self.warehouse_total_amount_all_products} kn.")
                 self.textBrowser_warehouse_product.append(f"Ukupno stavki: {self.warehouse_total_items}")
-                self.textBrowser_warehouse_product.append(f"Ukupno proizvoda: {self.warehouse_total_products} kom")
+                self.textBrowser_warehouse_product.append(f"Ukupno proizvoda: {self.warehouse_total_products} kom\n")
                 
                 self.total_items += self.warehouse_total_items
                 self.total_amount_all_products += self.warehouse_total_amount_all_products

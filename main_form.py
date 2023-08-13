@@ -25,13 +25,12 @@ from access_connector import (import_product,
 # imports custom UI widgets
 from show_image_form import Ui_Form
 from report_form import Report_Form
-# imports for PDF report
-import PIL.Image as Image
-from io import BytesIO
-from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Image, Spacer
+# imports for RTF and PDF
 import os
 from datetime import datetime
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from PIL import Image # for image handling in function "def get_image_data(self)"
 
 class Ui_MainWindow(object):
 
@@ -53,43 +52,41 @@ class Ui_MainWindow(object):
                 return
             if type_of_request == "generate":
                 self.product_data = data_dict
-            
-                sum_of_product = 0
-                count_of_name_product = 0
-                count_of_product = 0
+
                 date_of_report = datetime.now().strftime("%Y-%m-%d")
 
                 rtf_report = "{\\rtf1\\ansi\n"
-                rtf_report += "RTF report - baza skladiste - tablica proizvodi "
-                rtf_report += f"\line Datum izvjestaja: {date_of_report} \line "
-                rtf_report += " \line Ispis svih proizvoda i njegovih karakteristika \line"
-                rtf_report += "-------------------------------------------------------- "
-                
-                for product, value in data_dict.items():
-                    count_of_name_product += 1
-                    
-                    cijena = value['cijena']
-                    kolicina = value['kolicina']
-                    skladiste_id = value['skladiste_id']
-                    kategorija = value['kategorija']
+                rtf_report += "Izvjestaj iz baze podataka: 'skladiste.accdb', tablica: 'proizvodi' \line "
+                rtf_report += f"Datum izvjestaja: {date_of_report} \line "
+                rtf_report += "--------------------------------------------------------- \line\line"
 
-                    sum_of_product += cijena * kolicina
-                    count_of_product += kolicina
-                    
-                    # Format the data as per your requirements
-                    rtf_report += f"\line Naziv - {product}"
-                    rtf_report += f"\line Kategorija - {kategorija}"
-                    rtf_report += f"\line Cijena - {cijena} kn"
-                    rtf_report += f"\line Kolicina: {kolicina}"
-                    rtf_report += f"\line ID skladista: {skladiste_id}"
-                    rtf_report += "\line"  # Add a blank line between products
+                total_amount_all_products = 0
+                total_items = 0
+                total_products = 0
 
-                rtf_report += "-------------------------------------------------------- \line"
-                rtf_report += f"\line Ukupni iznos svih proizvoda iznosi: {sum_of_product} kn."
-                rtf_report += f"\line Ukupno stavki: {count_of_name_product}."
-                rtf_report += f"\line Ukupno proizvoda: {count_of_product} kom."
+                for product, value in self.product_data.items():
+                    total_items += 1
 
-                rtf_report += "}"  # Closing tag for RTF document
+                    product_category = value["kategorija"]
+                    product_price = value["cijena"]
+                    product_quantity = value["kolicina"]
+                    product_warehouse_id = value["skladiste_id"]
+
+                    total_amount_all_products += product_price * product_quantity
+                    total_products += product_quantity
+
+                    rtf_report += f"Naziv - {product} \line "
+                    rtf_report += f"Kategorija - {product_category} \line "
+                    rtf_report += f"Cijena - {product_price} kn \line "
+                    rtf_report += f"Kolicina: {product_quantity} \line "
+                    rtf_report += f"ID skladista: {product_warehouse_id} \line\line "
+
+                rtf_report += "--------------------------------------------------------- \line "
+                rtf_report += f" \line Ukupni iznos svih proizvoda iznosi: {total_amount_all_products} kn. \line "
+                rtf_report += f"Ukupno stavki: {total_items} \line "
+                rtf_report += f"Ukupno proizvoda: {total_products} kom. \line "
+                rtf_report += "}"
+
                 print(rtf_report)
 
                 # Get the current date and time
@@ -115,115 +112,149 @@ class Ui_MainWindow(object):
         # function to fetch data and generate master detail report in RTF
         def get_master_detail_data(self, type_of_request):
             data_dict = get_master_detail_data()
-            
+
             if type_of_request == "show":
                 self.master_detail_data = data_dict
                 return
+
             if type_of_request == "generate":
                 self.product_data = data_dict
-                # opening tag for RTF document
-                rtf_report = "{\\rtf1\\ansi\n" 
-
-                sum_of_product = 0
-                for key, products in data_dict.items():
-                    rtf_report += f"Skladiste ID: {key} \line\line "
-                    for product in products:
-                        cijena = product['cijena']
-                        kolicina = product['kolicina']
-                        skladiste_id = product['skladiste_id']
-                        kategorija = product['kategorija']
-                        naziv = product['naziv']
-                        privitak = product['privitak']
-
-                        rtf_report += f"Naziv - {naziv} \line "
-                        rtf_report += f"Kategorija - {kategorija} \line "
-                        rtf_report += f"Cijena - {cijena} \line "
-                        rtf_report += f"Kolicina: {kolicina} \line "
-                        rtf_report += f"ID skladista: {skladiste_id} \line "
-                        rtf_report += f"Sadrzi privitak: {privitak} \line"
-                        if privitak == -1:
-                            rtf_report += f"Sadrzi privitak: DA \line"
-                        else:
-                            rtf_report += f"Sadrzi privitak: NE \line"
-                        rtf_report += " \line "
-
-                        sum_of_product += cijena * kolicina
-                    rtf_report += " \line "
-                    
-                rtf_report += f"Ukupna iznos svih proizvoda iznosi: {sum_of_product} kn \line "
-                rtf_report += "}"  # Closing tag for RTF document
 
                 # Get the current date and time
-                current_datetime = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+                current_datetime = datetime.now().strftime("%Y-%m-%d")
 
                 # Get the current directory of the main script
                 current_directory = os.path.dirname(os.path.abspath(__file__))
 
                 # Create the 'reports' directory if it doesn't exist
-                reports_directory = os.path.join(current_directory, 'reports/master_detail_rtf')
+                reports_directory = os.path.join(current_directory, 'reports/master_detail_pdf')
                 if not os.path.exists(reports_directory):
                     os.makedirs(reports_directory)
 
                 # Construct the filename with date and time
-                filename = os.path.join(reports_directory, f"{current_datetime}_products.rtf")
+                filename = os.path.join(reports_directory, f"{current_datetime}_master-detail.pdf")
 
-                # Write the RTF content to the file
-                with open(filename, 'w', encoding='utf-8') as rtf_file:
-                    rtf_file.write(rtf_report)
-                    
-                self.master_detail_data = rtf_report
+                # Create a PDF canvas with A4 size
+                c = canvas.Canvas(filename, pagesize=A4)
+
+                # Set initial y-coordinate for content
+                y = A4[1] - 50
+
+                sum_of_all_products = 0
+                total_items = 0
+                total_products = 0
+
+                c.drawString(50, y, "Izvjestaj za master-detail (skladiste->proizvodi)")
+                y -= 15
+                c.drawString(50, y, f"Datum izvjestaja: {current_datetime}")
+                y -= 30
+
+                for key, products in data_dict.items():
+                    c.drawString(50, y, "-" * 50)
+                    y -= 15
+
+                    c.drawString(50, y, f"Skladiste ID: {key}")
+                    y -= 15
+
+                    for product in products:
+                        c.drawString(50, y, f"Naziv - {product['naziv']}")
+                        y -= 15
+                        c.drawString(50, y, f"Kategorija - {product['kategorija']}")
+                        y -= 15
+                        c.drawString(50, y, f"Cijena - {product['cijena']}")
+                        y -= 15
+                        c.drawString(50, y, f"Kolicina: {product['kolicina']}")
+                        y -= 15
+                        c.drawString(50, y, f"ID skladišta: {product['skladiste_id']}")
+                        y -= 15
+                        if product['privitak'] == -1:
+                            c.drawString(50, y, f"Sadrzi privitak: DA")
+                        else:
+                            c.drawString(50, y, f"Sadrzi privitak: NE")
+                        y -= 30
+
+                        sum_of_all_products += product['cijena'] * product['kolicina']
+                        total_items += 1
+                        total_products += product['kolicina']
+
+                    c.drawString(50, y, f"Statistika za skladiste ID: {key}")
+                    y -= 15
+                    c.drawString(50, y, f"Ukupni iznos svih proizvoda iznosi: {sum_of_all_products} kn.")
+                    y -= 15
+                    c.drawString(50, y, f"Ukupno stavki: {total_items}")
+                    y -= 15
+                    c.drawString(50, y, f"Ukupno proizvoda: {total_products} kom")
+                    y -= 30
+
+                c.drawString(50, y, "-" * 50)
+                y -= 15
+
+                c.drawString(50, y, "Statistika za sva skladista:")
+                y -= 15
+                c.drawString(50, y, f"Ukupni iznos svih proizvoda iznosi: {sum_of_all_products} kn.")
+                y -= 15
+                c.drawString(50, y, f"Ukupno stavki: {total_items}")
+                y -= 15
+                c.drawString(50, y, f"Ukupno proizvoda: {total_products} kom")
+                y -= 30
+
+                c.save()
+                self.master_detail_data = filename
         
-        # function to fetch and save report of images to PDF
-        def get_images_data(self):
+        def get_image_data(self):
             rows = get_image_for_pdf()
+    
+            output_directory = "reports/image_pdf_reports.pdf"
             
-            pdf_buffer = BytesIO()
-            doc = SimpleDocTemplate(pdf_buffer, pagesize=letter)
-            # Create a list to hold your flowables (content)
-            elements = []
-            rows = get_image_for_pdf()
+            # Create the output directory if it doesn't exist
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
 
-            # Iteriraj kroz redove i obradi slike
-            for row in rows:
-                img_data = row.privitak
-                img_stream = BytesIO(img_data)
-                img = Image(img_stream)
-
-                # Get the dimensions of the image
-                img_width = img.drawWidth
-                img_height = img.drawHeight
-
-                # Resize the image to fit within the available space
-                max_width = 456.0  # Maximum width of the frame
-                max_height = 636.0  # Maximum height of the frame
-
-                if img_width > max_width or img_height > max_height:
-                    img_width_ratio = max_width / img_width
-                    img_height_ratio = max_height / img_height
-                    img_ratio = min(img_width_ratio, img_height_ratio)
-                    img_width *= img_ratio
-                    img_height *= img_ratio
-
-                # Add the image to the list of elements
-                img.drawWidth = img_width
-                img.drawHeight = img_height
-                elements.append(img)
-                elements.append(Spacer(1, 10))  # Add some space between images
+            pdf_filename = os.path.join(output_directory, f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}_image_report_PDF.pdf")
+            c = canvas.Canvas(pdf_filename, pagesize = A4)
+            
+            # Add the title and date at the beginning of the PDF
+            title = "PDF izvjestaj slika iz tablice proizvodi"
+            current_date = "Datum: 2023-08-13"  # Replace this with the actual current date
+            
+            c.setFont("Helvetica-Bold", 14)
+            c.drawString(100, A4[1] - 50, title)
+            c.setFont("Helvetica", 12)
+            c.drawString(100, A4[1] - 70, current_date)
+            
+            y_position = A4[1] - 100
+            
+            for index, (product_name, image_data) in enumerate(rows):
+                # Save the image data to a temporary file
+                temp_image_path = f"temp_image_{index}.jpg"
+                with open(temp_image_path, 'wb') as temp_image_file:
+                    temp_image_file.write(image_data)
                 
-            # Build the PDF document
-            doc.build(elements)
-
-            # Generate a timestamp-based filename
-            timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-            pdf_filename = f'reports/images_pdf/{timestamp}.pdf'
-
-            # Save the PDF to the specified path
-            with open(pdf_filename, 'wb') as pdf_file:
-                pdf_file.write(pdf_buffer.getvalue())
-
-            print('PDF slike su spremljene u', pdf_filename)
-
-
+                image = Image.open(temp_image_path)
+                
+                # Scale the image while maintaining its aspect ratio
+                max_width = 400  # Adjust as needed
+                max_height = 300  # Adjust as needed
+                image.thumbnail((max_width, max_height))
+                
+                # Draw product name
+                c.setFont("Helvetica-Bold", 12)
+                c.drawString(100, y_position, product_name)
+                y_position -= 20
+                
+                # Draw image
+                img_width, img_height = image.size
+                c.drawImage(temp_image_path, 100, y_position - img_height, width=img_width, height=img_height)
+                y_position -= img_height + 20
+                
+                # Close the image
+                image.close()
+                
+                # Delete the temporary image file
+                os.remove(temp_image_path)
+            
+            c.save()
+        
         def product_report(self):
             pass
         # RTF report
@@ -669,12 +700,11 @@ class Ui_MainWindow(object):
         # inside the project folder "reports/*"
         self.report_generator_data.get_product_data(self, "generate")
         self.report_generator_data.get_master_detail_data(self, "generate")
-        self.report_generator_data.get_images_data(self)
+        self.report_generator_data.get_image_data(self)
         QtWidgets.QMessageBox.information(self.MainWindow,
                                        "Reports generated successfully",
                                        "Reports are saved inside folder 'reprots'.")
 
-    
     # function related to button self.button_show_reports
     # on click calls widget report_form.py that shows databse reports
     def show_report_form(self):
