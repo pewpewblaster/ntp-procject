@@ -98,6 +98,10 @@ class Report_Form(object):
             self.warehouse_total_items = 0 
             self.warehouse_total_products = 0
             
+            self.textBrowser_warehouse_product.append("Izvjestaj za master-datel (skladiste->proizvodi)")
+            self.textBrowser_warehouse_product.append(f"Datum izvjestaja: {self.date_of_report}")
+            self.textBrowser_warehouse_product.append(f"---------------------------------------------------------\n")
+
             for skladiste_id, products in self.master_detail_data.items():
                 self.textBrowser_warehouse_product.append(f"Skladiste ID: {skladiste_id}\n")
 
