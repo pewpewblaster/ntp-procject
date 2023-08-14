@@ -109,6 +109,7 @@ class Ui_MainWindow(object):
                     rtf_file.write(rtf_report)
                 
                 self.product_data = rtf_report
+                print("Product report completed.")
 
         # function to fetch data and generate master detail report in RTF
         def get_master_detail_data(self, type_of_request):
@@ -201,6 +202,7 @@ class Ui_MainWindow(object):
 
                 c.save()
                 self.master_detail_data = filename
+                print("Master-detail report completed.")
         # functions that fetches data from database and generates PDF report of images
         def get_image_data(self):
             
@@ -256,7 +258,7 @@ class Ui_MainWindow(object):
                 os.remove(temp_image_path)
             
             c.save()
-
+            print("Image PDF report completed.")
     class ParallelTaskExecutor:
         def __init__(self, max_workers):
             self.max_workers = max_workers
@@ -725,9 +727,9 @@ class Ui_MainWindow(object):
 
         number_of_threads = 4
         self.threadpool = Ui_MainWindow.ParallelTaskExecutor(number_of_threads)
-        list_of_tasks = [lambda: self.report_generator_data.get_product_data(self, "generate"),
+        list_of_tasks = [lambda: self.report_generator_data.get_image_data(self),
                          lambda: self.report_generator_data.get_master_detail_data(self, "generate"),
-                         lambda: self.report_generator_data.get_image_data(self)]
+                         lambda: self.report_generator_data.get_product_data(self, "generate"),]
         
         self.threadpool.run_tasks(list_of_tasks)
         self.threadpool.shutdown()
@@ -818,8 +820,8 @@ class Ui_MainWindow(object):
         # kasniju upotrebu kod sortiranja
 
         self.table_proizvodi_array, self.header, list_of_skladiste_id = get_table(warehouse_id)
-        print(self.table_proizvodi_array)
-        print(self.header)
+        # print(self.table_proizvodi_array)
+        # print(self.header)
         print("Print count_skladiste_id {}".format(list_of_skladiste_id))
 
         if warehouse_id not in list_of_skladiste_id:
@@ -835,22 +837,30 @@ class Ui_MainWindow(object):
             self.table_proizvodi.setHorizontalHeaderLabels(self.header)
             
             for x, row in enumerate(self.table_proizvodi_array):
+                print(x)
+                print(row)
                 for y, column_value in enumerate(row):
-                    value = QtWidgets .QTableWidgetItem(str(column_value))
+                    if column_value is None:
+                        value = QtWidgets.QTableWidgetItem("N/A")
+                    elif isinstance(column_value, bytes):
+                        value = QtWidgets.QTableWidgetItem("Available")
+                    else:
+                        # print(column_value)
+                        value = QtWidgets .QTableWidgetItem(str(column_value))
                     self.table_proizvodi.setItem(x, y, value)
             
             # update information labela
-            print("Prije crasha")
-            print(self.table_proizvodi_array)
+            # print("Prije crasha")
+            # print(self.table_proizvodi_array)
             
             if not self.table_proizvodi_array:
                 QtWidgets.QMessageBox.warning(self.MainWindow, "Error", f"Warehouse by id: {warehouse_id} has no products!")
-            else:
-                self.label_warehouse_information_id_show.setText(str(self.table_proizvodi_array[0][0]))
-                self.label_warehouse_information_name_show.setText(str(self.table_proizvodi_array[0][1]))
-                self.label_warehouse_information_street_show.setText(str(self.table_proizvodi_array[0][2]))
-                self.label_warehouse_information_city_show.setText(str(self.table_proizvodi_array[0][3]))
-                self.label_warehouse_information_country_show.setText(str(self.table_proizvodi_array[0][4]))
+            # else:
+            #     self.label_warehouse_information_id_show.setText(str(self.table_proizvodi_array[0][0]))
+            #     self.label_warehouse_information_name_show.setText(str(self.table_proizvodi_array[0][1]))
+            #     self.label_warehouse_information_street_show.setText(str(self.table_proizvodi_array[0][2]))
+            #     self.label_warehouse_information_city_show.setText(str(self.table_proizvodi_array[0][3]))
+            #     self.label_warehouse_information_country_show.setText(str(self.table_proizvodi_array[0][4]))
         
     def table_show_data_filter(self):
         product_filter = self.edit_find_warehouse_by_product.text()
