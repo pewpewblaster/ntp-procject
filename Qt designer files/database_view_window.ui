@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1300</width>
-    <height>863</height>
+    <width>1304</width>
+    <height>872</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1155,7 +1155,7 @@
       <x>30</x>
       <y>630</y>
       <width>171</width>
-      <height>141</height>
+      <height>91</height>
      </rect>
     </property>
     <property name="title">
@@ -1187,17 +1187,69 @@
       <string>Show reports</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="button_generate_reports_2">
+   </widget>
+   <widget class="QGroupBox" name="groupBox_total_cost">
+    <property name="geometry">
+     <rect>
+      <x>750</x>
+      <y>620</y>
+      <width>531</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Total cost of all products</string>
+    </property>
+    <widget class="QLabel" name="label_refresh">
      <property name="geometry">
       <rect>
-       <x>20</x>
-       <y>90</y>
+       <x>10</x>
+       <y>20</y>
        <width>131</width>
-       <height>41</height>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
-      <string>Generate reports</string>
+      <string>Time of the data refresh:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_refresh_time">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>20</y>
+       <width>151</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_sum_product_price">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Sum of product price:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_sum_product_price_show">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>40</y>
+       <width>151</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
      </property>
     </widget>
    </widget>
@@ -1210,7 +1262,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1300</width>
+     <width>1304</width>
      <height>21</height>
     </rect>
    </property>

@@ -27,6 +27,7 @@ class ApplicationSettings:
         palette = QPalette()
         palette.setColor(QPalette.ColorRole.Window, QColor(*self.background_color))
         self.widget.setPalette(palette)
+    
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

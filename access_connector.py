@@ -54,41 +54,6 @@ def delete_product_by_id(product_id):
     
     return True
 
-# function for deleting warehose by id
-# def delete_warehouse_by_id(warehouse_id):
-#     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
-#     query = database_skladiste.cursor()
-    
-#     select_query = '''
-#         SELECT *
-#         FROM skladista
-#         WHERE skladiste_id = ?
-#     '''
-#     query.execute(select_query, (warehouse_id,))
-    
-#     result = query.fetchone() # (1, 'Skladiste 1', '123 Main St', 'New York', 'USA')
-    
-#     # ako ne postoji skladiste sa trazenim skladiste_id
-#     if not result:
-#         query.close()
-#         database_skladiste.close()
-#         print(f"Ne postji skladsite sa id: {warehouse_id}!")
-#         return False
-
-    
-#     delete_query = '''
-#             DELETE FROM skladista
-#             WHERE skladiste_id = ?
-#         '''
-
-#     query.execute(delete_query, (warehouse_id,))
-#     query.commit()
-
-#     query.close()
-#     database_skladiste.close()
-    
-#     return True
-
 def delete_warehouse_by_id(warehouse_id):
     database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
     query = database_skladiste.cursor()
@@ -423,7 +388,6 @@ def get_table(warehouse_id):
 
     query.close()
     database_skladiste.close()
-    print(table)
     return table, header, list_of_skladiste_id
 
 def get_table_by_filter(filter_product_by_name):
@@ -446,7 +410,6 @@ def get_table_by_filter(filter_product_by_name):
 
     query.close()
     database_skladiste.close()
-    print(table)
     return table, header, has_result
 
 def show_table(table_id):
@@ -464,17 +427,19 @@ def show_table(table_id):
         table = query.fetchall()
         header = [description[0] for description in query.description]
         table_array = [list(t) for t in table]
+        
+        # In the last element of the table_array list every character of the binary file was showm in the table column
+        # That coused slow downs in the program. Now that cell shows if product has an image or not with values "True" of "False"
+        for table_element in table_array:
+            if table_element[-1] != None:
+                table_element[-1] = "True"
+            else:
+                table_element[-1] = "False"
 
     query.close()
     database_skladiste.close()
 
-    # In the last element of the table_array list every character of the binary file was showm in the table column
-    # That coused slow downs in the program. Now that cell shows if product has an image or not with values "True" of "False"
-    for table_element in table_array:
-        if table_element[-1] != None:
-            table_element[-1] = "True"
-        else:
-            table_element[-1] = "False"
+
     return table_array, header
 
 def import_image(product_id, image_binary):
@@ -509,10 +474,7 @@ def get_image(product_id):
     if image_binary is None:
         return None
 
-    # print(image_binary[0])
     return image_binary[0]
-
-    # function for getting product report data
 
 # function that collects data for RTF report on product
 def get_product_data():
@@ -583,91 +545,32 @@ def get_image_for_pdf():
     database_skladiste.close()
     return rows
 
-
+def get_product_sum():
+        database_skladiste = pyodbc.connect(r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/skladiste.accdb;')
+        query = database_skladiste.cursor()
+        
+        query.execute('SELECT cijena * kolicina AS total_value FROM proizvodi')
+        rows = query.fetchall()
+        
+        query.close()
+        database_skladiste.close()
+        
+        # rows contains data like this [(45, ), (70, ), (250, ), (154, )]
+        # extract and save only values from tuple and sum them
+        sum = 0
+        for x in rows:
+            for y in x:
+                sum += y
+        
+        return sum
 
 
 ###############################
 ''' testni dio za funkcije'''
 ###############################
-import os
-from io import BytesIO
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from PIL import Image
-from datetime import datetime
-import threading
-import time
-import concurrent.futures
 
 if __name__ == "__main__":
-    
-    # Mock functions for demonstration purposes
-    def get_product_data(num_loops):
-        for _ in range(num_loops):
-            time.sleep(0.1)
-        print("Got product data")
-
-    def get_master_detail_data(num_loops):
-        for _ in range(num_loops):
-            time.sleep(0.1)
-        print("Got master-detail data")
-
-    def get_image_for_pdf(num_loops):
-        for _ in range(num_loops):
-            time.sleep(0.1)
-        print("Got image for PDF")
-
-    def concurrency_test(func):
-        start = time.time()
-        threads = []
-        for _ in range(3):
-            thread = threading.Thread(target=func, args=(100,))
-            threads.append(thread)
-            thread.start()
-
-        for thread in threads:
-            thread.join()
-
-        end = time.time()
-        delta_time = end - start
-        print(f"{func.__name__} Concurrency:", delta_time)
-
-    def parallelism_test(func):
-        start = time.time()
-        threads = []
-        for _ in range(3):
-            thread = threading.Thread(target=func, args=(100,))
-            thread.daemon = True
-            threads.append(thread)
-            thread.start()
-
-        for thread in threads:
-            thread.join()
-
-        end = time.time()
-        delta_time = end - start
-        print(f"{func.__name__} Parallelism:", delta_time)
-
-    def threadpool_test(func):
-        start = time.time()
-        executor = concurrent.futures.ThreadPoolExecutor(max_workers=3)
-        tasks = [executor.submit(func, 100) for _ in range(3)]
-
-        for task in tasks:
-            task.result()
-
-        end = time.time()
-        delta_time = end - start
-        print(f"{func.__name__} ThreadPool:", delta_time)
-
-    def main():
-        functions_to_test = [get_product_data, get_master_detail_data, get_image_for_pdf]
-
-        for func in functions_to_test:
-            for _ in range(10):
-                print(f"Testing {func.__name__}")
-                concurrency_test(func)
-                parallelism_test(func)
-                threadpool_test(func)
-                print("-" * 40)
-
+    # print(get_product_data())
+    # print(get_master_detail_data())
+    # print(get_image_for_pdf())
+    print(get_product_sum())
