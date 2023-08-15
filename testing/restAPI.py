@@ -40,8 +40,18 @@ result = {
       "ZAR":19.0749325839
    }
 }
-print(result["data"])
-for x in result["data"]:
 
-  print(result["data"][x])
+price_hrk = 519
+
+price_usd = price_hrk / result["data"]["HRK"]
+price_eur = price_usd * result["data"]["EUR"]
+price_cad = price_usd * result["data"]["CAD"]
+price_aud = price_usd * result["data"]["AUD"]
+
+print(f"Price in HRK: {price_hrk}")
+print(f"Price in EUR: {price_eur}")
+print(f"Price in USD: {price_usd}")
+print(f"Price in CAD: {price_cad}")
+print(f"Price in AUD: {price_aud}")
+
  
