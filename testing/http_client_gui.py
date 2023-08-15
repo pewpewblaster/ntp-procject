@@ -14,7 +14,7 @@ class DownloadThread(QThread):
         super().__init__(parent)
         self.url = url
         self.filename = filename
-        self.speed_limit_kb = speed_limit_kb * 1000
+        self.speed_limit_kb = speed_limit_kb
         self.stopped = False
 
     def run(self):
@@ -28,13 +28,15 @@ class DownloadThread(QThread):
                 if self.stopped:
                     break
 
-                elapsed_time = time.time() - start_time
+                elapsed_time = max(1, time.time() - start_time)  # Ensure elapsed_time is at least 1 second
                 if self.speed_limit_kb and elapsed_time < downloaded / self.speed_limit_kb:
                     time.sleep((downloaded / self.speed_limit_kb) - elapsed_time)
 
                 file.write(chunk)
                 downloaded += len(chunk)
-                self.update_progress.emit(downloaded * 100 // total_size, downloaded // 1024, int(downloaded / elapsed_time))
+                download_speed_kb = int(downloaded / elapsed_time)
+                self.update_progress.emit(downloaded * 100 // total_size, downloaded // 1024, download_speed_kb)
+
 
             if not self.stopped:
                 self.download_complete.emit()
@@ -111,10 +113,10 @@ class DownloaderApp(QMainWindow):
             self.download_thread.stopped = True
             self.stop_button.setEnabled(False)
 
-    def update_progress(self, percentage, downloaded_kb, speed):
+    def update_progress(self, percentage, downloaded_kb, speed_kb):
         self.progress_bar.setValue(percentage)
         self.percentage_label.setText(f'Percentage: {percentage}%')
-        self.speed_label.setText(f'Download Speed: {speed / 1000} KB/s')
+        self.speed_label.setText(f'Download Speed: {speed_kb} KB/s')
         self.downloaded_label.setText(f'Downloaded: {downloaded_kb} KB')
 
     def download_complete(self):

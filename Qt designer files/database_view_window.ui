@@ -1205,7 +1205,7 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>141</width>
+       <width>151</width>
        <height>16</height>
       </rect>
      </property>
@@ -1216,7 +1216,7 @@
     <widget class="QLabel" name="label_refresh_time">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>170</x>
        <y>20</y>
        <width>151</width>
        <height>16</height>
@@ -1231,7 +1231,7 @@
       <rect>
        <x>10</x>
        <y>40</y>
-       <width>141</width>
+       <width>151</width>
        <height>16</height>
       </rect>
      </property>
@@ -1242,10 +1242,10 @@
     <widget class="QLabel" name="label_sum_product_price_show">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>170</x>
        <y>40</y>
        <width>131</width>
-       <height>20</height>
+       <height>16</height>
       </rect>
      </property>
      <property name="text">
@@ -1408,6 +1408,19 @@
       <string>Convert</string>
      </property>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="button_http_client">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>20</y>
+      <width>131</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show HTTP client</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

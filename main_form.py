@@ -28,6 +28,8 @@ from access_connector import (import_product,
 # imports custom UI widgets
 from show_image_form import Ui_Form
 from report_form import Report_Form
+from http_client_form import Ui_download_client
+
 # imports for RTF and PDF
 import os
 from datetime import datetime
@@ -38,6 +40,8 @@ from PIL import Image # for image handling in function "def get_image_data(self)
 import time
 import concurrent.futures
 import threading
+# imports for API REST requests - class getAPIRequest
+import freecurrencyapi
 
 class Ui_MainWindow(QMainWindow):
     
@@ -266,7 +270,7 @@ class Ui_MainWindow(QMainWindow):
             print("Image PDF report completed.")
     
     # Class for multithreading with threadpool
-    class ParallelTaskExecutor:
+    class ParallelTaskExecutor():
         def __init__(self, max_workers):
             self.max_workers = max_workers
             self.executor = concurrent.futures.ThreadPoolExecutor(self.max_workers)
@@ -290,6 +294,8 @@ class Ui_MainWindow(QMainWindow):
         def shutdown(self):
             self.executor.shutdown()
 
+    # Class for UI element refresh without user input
+    # need to implement mutex
     class UIComponentRefresh(QThread):
         
         total_cost_refesh_timer = 0
@@ -322,6 +328,22 @@ class Ui_MainWindow(QMainWindow):
                 time.sleep(1)
                 self.total_cost_refesh_timer -= 1
 
+    class getAPIRequest():
+        def __init__(self):
+            # api calls from https://freecurrencyapi.com/
+            self.api_key = "fca_live_q3f19H5W4sNXKQKanPQG16G5LGV3Hiv5z7QJiOKa"
+            self.api_result = None
+        
+        def get_api_result(self):
+            client = freecurrencyapi.Client('fca_live_q3f19H5W4sNXKQKanPQG16G5LGV3Hiv5z7QJiOKa')
+            # client.latest() return python dictionary with currency type as keys
+            # and currency value as values
+            # Base currency is USD
+            self.api_result = client.latest()
+            
+        def return_api_result(self):
+            return self.api_result
+    
     def setupUi(self, MainWindow, selected_language, signed_user):
         print()
         MainWindow.setObjectName("MainWindow")
@@ -797,9 +819,19 @@ class Ui_MainWindow(QMainWindow):
         self.button_convert_currencies = QtWidgets.QPushButton(parent=self.groupBox_exchange_rate)
         self.button_convert_currencies.setGeometry(QtCore.QRect(20, 120, 101, 23))
         self.button_convert_currencies.setObjectName("button_convert_currencies")
+        self.button_convert_currencies.clicked.connect(self.convert_currencies)
         
+        """ Button for http client """
+        self.button_http_client = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.button_http_client.setGeometry(QtCore.QRect(330, 20, 131, 23))
+        self.button_http_client.setObjectName("pushButton")
+        self.button_http_client.clicked.connect(self.open_http_client)
+        
+        # part that calls localisation function (def retranslateUi(self, MainWindow))
         self.retranslateUi(MainWindow)
         
+
+        """ Auto update elemens of the GUI """
         self.refresh_thread = Ui_MainWindow.UIComponentRefresh(get_product_sum)
         self.refresh_thread.update_signal_time.connect(self.update_time_label)
         self.refresh_thread.update_singal_date.connect(self.update_date_label)
@@ -817,6 +849,41 @@ class Ui_MainWindow(QMainWindow):
 
     ''' Custom funkcije  '''
 
+    def open_http_client(self):
+        self.main_window = QtWidgets.QMainWindow()
+        self.http_client = Ui_download_client()
+        self.http_client.setupUi(self.main_window)
+        self.main_window.show()
+
+    # function that is called when button_convert_currencies is clicked
+    # it converts currency from hrk to other currencies listed on the GUI
+    def convert_currencies(self):
+        self.api_object = Ui_MainWindow.getAPIRequest()
+        self.api_object.get_api_result()
+        
+        # here is save dictionary with currency exchange rates
+        self.api_data = self.api_object.return_api_result()
+        print(self.api_data)
+        
+        self.price_hrk = int(self.label_sum_product_price_show.text())
+
+        # conversion to other currencies
+        self.price_usd = self.price_hrk / self.api_data["data"]["HRK"]
+        self.price_eur = self.price_usd * self.api_data["data"]["EUR"]
+        self.price_cad = self.price_usd * self.api_data["data"]["CAD"]
+        self.price_aud = self.price_usd * self.api_data["data"]["AUD"]
+        self.price_gbp = self.price_usd * self.api_data["data"]["GBP"]
+        
+        # set values to corresponding labels and round it to 2 decimal points
+        self.label_eur_show.setText(str(round(self.price_eur, 2)))
+        self.label_usd_show.setText(str(round(self.price_usd, 2)))
+        self.label_cad_show.setText(str(round(self.price_cad, 2)))
+        self.label_aud_show.setText(str(round(self.price_aud, 2)))
+        self.label_gbp_show.setText(str(round(self.price_gbp, 2)))
+        
+    # function used in conjuction with self.refresh_threadfresh_thread
+    # to update the time, date and refresh time labels
+    # in the main window
     def update_time_label(self, new_time):
         self.label_time_show.setText(new_time)
 
@@ -1221,3 +1288,4 @@ class Ui_MainWindow(QMainWindow):
         self.label_gbp_show.setText(_translate("MainWindow", ""))
         self.label_gbp.setText(_translate("MainWindow", "GBP:"))
         self.button_convert_currencies.setText(_translate("MainWindow", "Convert"))
+        self.button_http_client.setText(_translate("MainWindow", "Show HTTP client"))
