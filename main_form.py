@@ -37,6 +37,7 @@ from PIL import Image # for image handling in function "def get_image_data(self)
 # imports for multithreading
 import time
 import concurrent.futures
+import threading
 
 class Ui_MainWindow(QMainWindow):
     
@@ -745,19 +746,57 @@ class Ui_MainWindow(QMainWindow):
         self.groupBox_total_cost.setGeometry(QtCore.QRect(750, 620, 531, 61))
         self.groupBox_total_cost.setObjectName("groupBox_total_cost")
         self.label_refresh = QtWidgets.QLabel(parent=self.groupBox_total_cost)
-        self.label_refresh.setGeometry(QtCore.QRect(10, 20, 131, 16))
+        self.label_refresh.setGeometry(QtCore.QRect(10, 20, 151, 16))
         self.label_refresh.setObjectName("label_refresh")
         self.label_refresh_time = QtWidgets.QLabel(parent=self.groupBox_total_cost)
-        self.label_refresh_time.setGeometry(QtCore.QRect(140, 20, 151, 16))
+        self.label_refresh_time.setGeometry(QtCore.QRect(170, 20, 151, 16))
         self.label_refresh_time.setText("")
         self.label_refresh_time.setObjectName("label_refresh_time")
         self.label_sum_product_price = QtWidgets.QLabel(parent=self.groupBox_total_cost)
-        self.label_sum_product_price.setGeometry(QtCore.QRect(10, 40, 121, 16))
+        self.label_sum_product_price.setGeometry(QtCore.QRect(10, 40, 151, 16))
         self.label_sum_product_price.setObjectName("label_sum_product_price")
         self.label_sum_product_price_show = QtWidgets.QLabel(parent=self.groupBox_total_cost)
-        self.label_sum_product_price_show.setGeometry(QtCore.QRect(140, 40, 151, 16))
+        self.label_sum_product_price_show.setGeometry(QtCore.QRect(170, 40, 131, 16))
         self.label_sum_product_price_show.setText("")
         self.label_sum_product_price_show.setObjectName("label_sum_product_price_show")
+        
+        """ Groupbox Total product price in other currencies"""
+        self.groupBox_exchange_rate = QtWidgets.QGroupBox(parent=self.centralwidget)
+        self.groupBox_exchange_rate.setGeometry(QtCore.QRect(750, 690, 531, 151))
+        self.groupBox_exchange_rate.setObjectName("groupBox")
+        self.label_eur = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_eur.setGeometry(QtCore.QRect(20, 20, 47, 13))
+        self.label_eur.setObjectName("label_eur")
+        self.label_eur_show = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_eur_show.setGeometry(QtCore.QRect(80, 20, 47, 13))
+        self.label_eur_show.setObjectName("label_eur_show")
+        self.label_usd = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_usd.setGeometry(QtCore.QRect(20, 40, 47, 13))
+        self.label_usd.setObjectName("label_usd")
+        self.label_usd_show = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_usd_show.setGeometry(QtCore.QRect(80, 40, 47, 13))
+        self.label_usd_show.setObjectName("label_usd_show")
+        self.label_cad = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_cad.setGeometry(QtCore.QRect(20, 60, 47, 13))
+        self.label_cad.setObjectName("label_cad")
+        self.label_cad_show = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_cad_show.setGeometry(QtCore.QRect(80, 60, 47, 13))
+        self.label_cad_show.setObjectName("label_cad_show")
+        self.label_aud = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_aud.setGeometry(QtCore.QRect(20, 80, 47, 13))
+        self.label_aud.setObjectName("label_aud")
+        self.label_aud_show = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_aud_show.setGeometry(QtCore.QRect(80, 80, 47, 13))
+        self.label_aud_show.setObjectName("label_aud_show")
+        self.label_gbp_show = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_gbp_show.setGeometry(QtCore.QRect(80, 100, 47, 13))
+        self.label_gbp_show.setObjectName("label_gbp_show")
+        self.label_gbp = QtWidgets.QLabel(parent=self.groupBox_exchange_rate)
+        self.label_gbp.setGeometry(QtCore.QRect(20, 100, 47, 13))
+        self.label_gbp.setObjectName("label_gbp")
+        self.button_convert_currencies = QtWidgets.QPushButton(parent=self.groupBox_exchange_rate)
+        self.button_convert_currencies.setGeometry(QtCore.QRect(20, 120, 101, 23))
+        self.button_convert_currencies.setObjectName("button_convert_currencies")
         
         self.retranslateUi(MainWindow)
         
@@ -873,7 +912,6 @@ class Ui_MainWindow(QMainWindow):
         
         # self.table_proizvodi_array is a list, that contains tuples for its element
         # convert tuples to the list for easy manipulation of the list
-        new_array_table_warehouse_products = []
         self.new_array_table_warehouse_products = [list(x) for x in self.table_show_warehouse_products_array]
         
         # checks for the last element in the inner array, if it is None, it sets it to False, otherway True
@@ -917,6 +955,7 @@ class Ui_MainWindow(QMainWindow):
         
         # self.table_proizvodi_array is a list, that contains tuples for its element
         # convert tuples to the list for easy manipulation of the list
+        print(self.table_proizvodi_array)
         self.new_array_table_proizvodi = [list(x) for x in self.table_proizvodi_array]
         
         # checks for the last element in the inner array, if it is None, it sets it to False, otherway True
@@ -996,6 +1035,12 @@ class Ui_MainWindow(QMainWindow):
         product_filter = self.edit_find_warehouse_by_product.text()
         
         self.table_filter_array, self.table_filter_header, has_result = get_table_by_filter(product_filter)
+        
+        # update self.table_proizvodi_array and self.header with new values
+        # so the update_table function can use them to update the table (sort)
+        # on the GUI with new value for the filter table search
+        self.table_proizvodi_array = self.table_filter_array
+        self.header = self.table_filter_header
         
         if has_result == False:
             QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Not found in database")
@@ -1163,4 +1208,16 @@ class Ui_MainWindow(QMainWindow):
         self.button_show_reports.setText(_translate("MainWindow", "Show reports"))
         self.groupBox_total_cost.setTitle(_translate("MainWindow", "Total cost of all products"))
         self.label_refresh.setText(_translate("MainWindow", "Time of the data refresh:"))
-        self.label_sum_product_price.setText(_translate("MainWindow", "Sum of product price:"))
+        self.label_sum_product_price.setText(_translate("MainWindow", "Sum of product price in HRK:"))
+        self.groupBox_exchange_rate.setTitle(_translate("MainWindow", "Total product price in other currencies"))
+        self.label_eur.setText(_translate("MainWindow", "EUR:"))
+        self.label_eur_show.setText(_translate("MainWindow", ""))
+        self.label_usd.setText(_translate("MainWindow", "USD:"))
+        self.label_usd_show.setText(_translate("MainWindow", ""))
+        self.label_cad.setText(_translate("MainWindow", "CAD:"))
+        self.label_cad_show.setText(_translate("MainWindow", ""))
+        self.label_aud.setText(_translate("MainWindow", "AUD:"))
+        self.label_aud_show.setText(_translate("MainWindow", ""))
+        self.label_gbp_show.setText(_translate("MainWindow", ""))
+        self.label_gbp.setText(_translate("MainWindow", "GBP:"))
+        self.button_convert_currencies.setText(_translate("MainWindow", "Convert"))

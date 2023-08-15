@@ -407,6 +407,15 @@ def get_table_by_filter(filter_product_by_name):
 
     # ako query prodje u 'has_result' se zapise True, suprutno False
     has_result = bool(table)
+    
+    # last element is either type None or Binary string
+    # for better performance we change it to True or False
+    # to show if the element has imaage or not
+    for table_element in table:
+        if table_element[-1] != None:
+            table_element[-1] = "True"
+        else:
+            table_element[-1] = "False"
 
     query.close()
     database_skladiste.close()
