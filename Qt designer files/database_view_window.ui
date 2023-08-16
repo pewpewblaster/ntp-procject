@@ -1422,6 +1422,19 @@
      <string>Show HTTP client</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="button_soap_client">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>50</y>
+      <width>131</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show SOAP client</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="enabled">

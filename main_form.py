@@ -29,6 +29,7 @@ from access_connector import (import_product,
 from show_image_form import Ui_Form
 from report_form import Report_Form
 from http_client_form import Ui_download_client
+from soap_client_form import Ui_soap_client
 
 # imports for RTF and PDF
 import os
@@ -821,11 +822,17 @@ class Ui_MainWindow(QMainWindow):
         self.button_convert_currencies.setObjectName("button_convert_currencies")
         self.button_convert_currencies.clicked.connect(self.convert_currencies)
         
-        """ Button for http client """
+        """ Button for HTTP client """
         self.button_http_client = QtWidgets.QPushButton(parent=self.centralwidget)
         self.button_http_client.setGeometry(QtCore.QRect(330, 20, 131, 23))
         self.button_http_client.setObjectName("pushButton")
         self.button_http_client.clicked.connect(self.open_http_client)
+        
+        """ Button for SOAP client """
+        self.button_soap_client = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.button_soap_client.setGeometry(QtCore.QRect(330, 50, 131, 23))
+        self.button_soap_client.setObjectName("pushButton")
+        self.button_soap_client.clicked.connect(self.open_soap_client)
         
         # part that calls localisation function (def retranslateUi(self, MainWindow))
         self.retranslateUi(MainWindow)
@@ -848,7 +855,13 @@ class Ui_MainWindow(QMainWindow):
         
 
     ''' Custom funkcije  '''
-
+    
+    def open_soap_client(self):
+        self.main_window = QtWidgets.QMainWindow()
+        self.soap_client = Ui_soap_client()
+        self.soap_client.setupUi(self.main_window)
+        self.main_window.show()
+        
     def open_http_client(self):
         self.main_window = QtWidgets.QMainWindow()
         self.http_client = Ui_download_client()
@@ -1289,3 +1302,4 @@ class Ui_MainWindow(QMainWindow):
         self.label_gbp.setText(_translate("MainWindow", "GBP:"))
         self.button_convert_currencies.setText(_translate("MainWindow", "Convert"))
         self.button_http_client.setText(_translate("MainWindow", "Show HTTP client"))
+        self.button_soap_client.setText(_translate("MainWindow", "Show SOAP client"))
