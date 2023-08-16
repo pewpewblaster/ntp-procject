@@ -44,6 +44,7 @@ import threading
 # imports for API REST requests - class getAPIRequest
 import freecurrencyapi
 
+
 class Ui_MainWindow(QMainWindow):
     
     # Class fo report generation

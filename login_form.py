@@ -2,18 +2,23 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from access_connector import check_credentials
 from main_form import Ui_MainWindow
 from create_user_form import Ui_Form
-
+from winreg_utils import win_reg_app_data
 
 ''' global variable'''
 
+only_once = True
+supported_languages = ["French",
+                       "Croatian",
+                       "English",
+                       "German",
+                       "Spanish"]
 
 ''' classes '''
 class login_form(object):
     def login_ui(self, Form):
         self.Form = Form
         Form.setObjectName("Form")
-
-
+            
         # login button
         self.login_button = QtWidgets.QPushButton(parent=Form)
         self.login_button.setGeometry(QtCore.QRect(20, 160, 91, 21))
@@ -63,7 +68,7 @@ class login_form(object):
         self.comboBox.addItem("French")
         self.comboBox.addItem("German")
         self.comboBox.addItem("Spanish")
-        self.comboBox.activated.connect(lambda index: self.language_select(Form, self.comboBox.itemText(index)))
+        self.comboBox.activated.connect(lambda index: self.language_select(Form, self.comboBox.itemText(index), False))
 
         # language label
         self.label_language = QtWidgets.QLabel(parent=Form)
@@ -82,9 +87,19 @@ class login_form(object):
         self.push_button_settings.setGeometry(QtCore.QRect(20, 280, 191, 24))
         self.push_button_settings.setObjectName("push_button_new_user")
         self.push_button_settings.clicked.connect(self.open_settings)
-        
-        self.language_select(Form, self.comboBox.currentText())
+ 
+        self.language_select(Form, self.comboBox.currentText(), False)
         QtCore.QMetaObject.connectSlotsByName(Form)
+        
+        self.win_reg_settings = win_reg_app_data()
+        print(self.win_reg_settings)
+        
+        global only_once
+        if only_once == True:
+            only_once = False
+            if self.win_reg_settings["default_language"] not in supported_languages:
+                self.language_select(Form, "English", True)
+            self.language_select(Form, self.win_reg_settings["default_language"], True)
 
     def open_create_user_form(self):
         self.main_window = QtWidgets.QMainWindow()
@@ -107,10 +122,14 @@ class login_form(object):
 
 
     # localization
-    def language_select(self, Form, selected_language):
-        selected_language = self.comboBox.currentText()
+    def language_select(self, Form, language, from_winreg):
+        if from_winreg == True:
+            self.selected_language = language
         
-        if selected_language == "French":
+        else:
+            self.selected_language = self.comboBox.currentText()
+            
+        if self.selected_language == "French":
             _translate = QtCore.QCoreApplication.translate
             Form.setWindowTitle(_translate("Form", "Formulaire de connexion"))
             self.login_button.setText(_translate("Form", "Connexion"))
@@ -122,7 +141,7 @@ class login_form(object):
             self.push_button_new_user.setText(_translate("Form", "Gestion des utilisateurs"))
             self.push_button_settings.setText(_translate("Form", "Paramètres"))
 
-        if selected_language == "Croatian":
+        if self.selected_language == "Croatian":
             _translate = QtCore.QCoreApplication.translate
             Form.setWindowTitle(_translate("Form", "Obrazac za prijavu"))
             self.login_button.setText(_translate("Form", "Prijava"))
@@ -134,7 +153,7 @@ class login_form(object):
             self.push_button_new_user.setText(_translate("Form", "Upravljanje korisnicima"))
             self.push_button_settings.setText(_translate("Form", "Postavke"))
             
-        if selected_language == "English":
+        if self.selected_language == "English":
             _translate = QtCore.QCoreApplication.translate
             Form.setWindowTitle(_translate("Form", "Form"))
             self.login_button.setText(_translate("Form", "Login"))
@@ -147,7 +166,7 @@ class login_form(object):
             self.push_button_settings.setText(_translate("Form", "Settings"))
 
 
-        if selected_language == "German":
+        if self.selected_language == "German":
             _translate = QtCore.QCoreApplication.translate
             Form.setWindowTitle(_translate("Form", "Formular"))
             self.login_button.setText(_translate("Form", "Anmelden"))
@@ -159,7 +178,7 @@ class login_form(object):
             self.push_button_new_user.setText(_translate("Form", "Benutzerverwaltung"))
             self.push_button_settings.setText(_translate("Form", "Einstellungen"))
 
-        if selected_language == "Spanish":
+        if self.selected_language == "Spanish":
             _translate = QtCore.QCoreApplication.translate
             Form.setWindowTitle(_translate("Form", "Formulario"))
             self.login_button.setText(_translate("Form", "Iniciar sesión"))
