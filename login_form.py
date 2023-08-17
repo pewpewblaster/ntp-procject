@@ -3,6 +3,7 @@ from access_connector import check_credentials
 from main_form import Ui_MainWindow
 from create_user_form import Ui_Form
 from winreg_utils import win_reg_app_data
+from SQLite.sqlite3dll_handler_class import JwtDatabaseManager
 
 ''' global variable'''
 
@@ -18,7 +19,12 @@ class login_form(object):
     def login_ui(self, Form):
         self.Form = Form
         Form.setObjectName("Form")
-            
+        
+        ############
+        # test #####
+        ############
+        object_test = JwtDatabaseManager()
+        
         # login button
         self.login_button = QtWidgets.QPushButton(parent=Form)
         self.login_button.setGeometry(QtCore.QRect(20, 160, 91, 21))
