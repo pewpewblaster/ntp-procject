@@ -136,5 +136,5 @@ username = "Bob"
 json_web_token = "Token Example 420"
 
 
-update_or_insert_jwt(db_path, dll_path, "Matija", "Nista")
+update_or_insert_jwt(db_path, dll_path, "Matija", "Svasta")
 select_all_from_table(db_path, dll_path)

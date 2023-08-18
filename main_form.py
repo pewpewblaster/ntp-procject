@@ -835,6 +835,12 @@ class Ui_MainWindow(QMainWindow):
         self.button_soap_client.setObjectName("pushButton")
         self.button_soap_client.clicked.connect(self.open_soap_client)
         
+        """ Button for REST client """
+        self.button_rest_client = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.button_rest_client.setGeometry(QtCore.QRect(470, 20, 131, 23))
+        self.button_rest_client.setObjectName("pushButton")
+        # self.button_rest_client.clicked.connect(self.open_rest_client)
+        
         # part that calls localisation function (def retranslateUi(self, MainWindow))
         self.retranslateUi(MainWindow)
         
@@ -1304,3 +1310,4 @@ class Ui_MainWindow(QMainWindow):
         self.button_convert_currencies.setText(_translate("MainWindow", "Convert"))
         self.button_http_client.setText(_translate("MainWindow", "Show HTTP client"))
         self.button_soap_client.setText(_translate("MainWindow", "Show SOAP client"))
+        self.button_rest_client.setText(_translate("MainWindow", "REST client"))

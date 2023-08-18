@@ -1,0 +1,27 @@
+{
+    "DPD DIREKTNA PAKETNA DISTRIBUCIJA CROATIA d.o.o.": {
+        "address": "Slatinska 7, 10360 Zagreb-Sesvete",
+        "contact_number": "+385 (01) 3430 600",
+        "contact_mail": "info@dpd.hr"
+    },
+    "GLS Croatia d.o.o": {
+        "address": "Stupnicke Sipkovine 22, 10255, Donji Stupnik",
+        "contact_number": "+385 1 2042 672",
+        "contact_mail": "cs@gls-croatia.com"
+    },
+    "Overseas Trade Co Ltd. d.o.o.": {
+        "address": "Zastavnice 38A, Hrvatski Leskovac",
+        "contact_number": "+385 1 3454 555",
+        "contact_mail": "cs@overseas.hr"
+    },
+    "HP Hrvatska posta d.d.": {
+        "address": "Jurisiceva ulica 13, 10000 Zagreb",
+        "contact_number": "072 303 304",
+        "contact_mail": "https://obrasci.posta.hr/kontakt"
+    },
+    "New Logistic Company": {
+        "address": "123 Main St, City",
+        "contact_number": "+123 456 7890",
+        "contact_mail": "info@newlogistic.com"
+    }
+}

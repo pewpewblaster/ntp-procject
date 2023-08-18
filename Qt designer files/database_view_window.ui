@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1304</width>
+    <width>1262</width>
     <height>895</height>
    </rect>
   </property>
@@ -1435,6 +1435,19 @@
      <string>Show SOAP client</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="button_rest_client">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>20</y>
+      <width>131</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>REST client</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="enabled">
@@ -1444,7 +1457,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1304</width>
+     <width>1262</width>
      <height>21</height>
     </rect>
    </property>

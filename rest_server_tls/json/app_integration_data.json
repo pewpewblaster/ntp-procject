@@ -1,0 +1,30 @@
+{
+    "DPD DIREKTNA PAKETNA DISTRIBUCIJA CROATIA d.o.o.": {
+        "api_key": "a2b5c7d9e0f3g1h4i6j8k0l2m5n7p9q",
+        "web_portal": "https://dpdd-portal.hr",
+        "contact_person": "Ivan Horvat",
+        "phone": "+385 1 555 1234",
+        "email": "ivan.horvat@dpdd.hr"
+    },
+    "GLS Croatia d.o.o": {
+        "api_key": "b9e2f4g6h8i0j2k4l6m8n0p2q4r6s8t",
+        "web_portal": "https://gls-portal.hr",
+        "contact_person": "Marija Kovac",
+        "phone": "+385 1 555 5678",
+        "email": "marija.kovac@gls.hr"
+    },
+    "Overseas Trade Co Ltd. d.o.o.": {
+        "api_key": "c5i7j9k2l4m6n8p0q2r4s6t8u0v2w4x6y",
+        "web_portal": "https://overseas-portal.hr",
+        "contact_person": "Marko Novak",
+        "phone": "+385 1 555 9876",
+        "email": "marko.novak@overseas.hr"
+    },
+    "HP – Hrvatska posta d.d.": {
+        "api_key": "d8m4n6p1q3r5s7t9u0v2w4x6y8z0a2b4c",
+        "web_portal": "https://hp-portal.hr",
+        "contact_person": "Ana Lukic",
+        "phone": "+385 1 555 4321",
+        "email": "ana.lukic@hp.hr"
+    }
+}

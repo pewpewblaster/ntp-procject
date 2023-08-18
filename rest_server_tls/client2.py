@@ -1,5 +1,4 @@
-import requests
-import json
+import requests, json
 
 base_url = 'https://127.0.0.1:443/api'
 token_url = f'{base_url}/get_token'
