@@ -112,35 +112,68 @@ class login_form(object):
     def open_settings(self):
         pass 
 
+    # def login(self):
+    #     if check_credentials(self.edit_username.text(), self.edit_password.text()):
+            
+    #         # get JWT token
+    #         rest_server_url = "https://127.0.0.1:443/api/"
+    #         endpoint = "get_token"
+    #         header =  {'Username': self.edit_username.text()}
+    #         response = requests.get(rest_server_url + endpoint, headers=header, verify=False)
+    #         json_response = json.loads(response.text)
+    #         jtw_token = json_response.get("jwt_token")
+    #         print(f"JWT: {jtw_token}")
+    #         print(f"Type of JWT: {type(jtw_token)}")
+    #         # save token to the SQLite databse "db/jwt_database.db"
+    #         sqlite_handler = JwtDatabaseManager()
+    #         # 1st argument DB path
+    #         # 2nd argument DLL path
+    #         # 3rd argument username
+    #         # 4th argument JWT token
+    #         sqlite_handler.update_or_insert_jwt(self.edit_username.text(), jtw_token)
+            
+    #         self.main_window = QtWidgets.QMainWindow()
+    #         self.ui = Ui_MainWindow()
+    #         self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
+    #         self.main_window.show()
+    #         self.Form.close()
+    #     else:
+    #         QtWidgets.QMessageBox.warning(self.Form, "Login Failed", "Invalid username or password.")
+    
     def login(self):
         if check_credentials(self.edit_username.text(), self.edit_password.text()):
-            
-            # get JWT token
-            rest_server_url = "https://127.0.0.1:443/api/"
-            endpoint = "get_token"
-            header =  {'Username': self.edit_username.text()}
-            response = requests.get(rest_server_url + endpoint, headers=header, verify=False)
-            json_response = json.loads(response.text)
-            jtw_token = json_response.get("jwt_token")
-            print(f"JWT: {jtw_token}")
-            print(f"Type of JWT: {type(jtw_token)}")
-            # save token to the SQLite databse "db/jwt_database.db"
-            sqlite_handler = JwtDatabaseManager()
-            # 1st argument DB path
-            # 2nd argument DLL path
-            # 3rd argument username
-            # 4th argument JWT token
-            sqlite_handler.update_or_insert_jwt(self.edit_username.text(), jtw_token)
-            
-            self.main_window = QtWidgets.QMainWindow()
-            self.ui = Ui_MainWindow()
-            self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
-            self.main_window.show()
-            self.Form.close()
+            try:
+                rest_server_url = "https://nitroblaze.pythonanywhere.com/"
+                endpoint = "api/get_token"
+                header =  {'Username': self.edit_username.text()}
+                response = requests.get(rest_server_url + endpoint, headers=header, verify=False)
+                json_response = json.loads(response.text)
+                jtw_token = json_response.get("jwt_token")
+                print(f"JWT: {jtw_token}")
+                print(f"Type of JWT: {type(jtw_token)}")
+                
+                # Save token to the SQLite database "db/jwt_database.db"
+                sqlite_handler = JwtDatabaseManager()
+                sqlite_handler.update_or_insert_jwt(self.edit_username.text(), jtw_token)
+                
+                self.main_window = QtWidgets.QMainWindow()
+                self.ui = Ui_MainWindow()
+                self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
+                self.main_window.show()
+                self.Form.close()
+
+            except requests.exceptions.ConnectionError:
+                # Handle the connection error here
+                print("Connection to the REST server failed. Logging in without JWT token.")
+                
+                self.main_window = QtWidgets.QMainWindow()
+                self.ui = Ui_MainWindow()
+                self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
+                self.main_window.show()
+                self.Form.close()
         else:
             QtWidgets.QMessageBox.warning(self.Form, "Login Failed", "Invalid username or password.")
-
-
+    
     # localization
     def language_select(self, Form, language, from_winreg):
         if from_winreg == True:

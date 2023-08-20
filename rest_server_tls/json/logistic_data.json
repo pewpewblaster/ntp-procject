@@ -23,5 +23,10 @@
         "address": "123 Main St, City",
         "contact_number": "+123 456 7890",
         "contact_mail": "info@newlogistic.com"
+    },
+    "Axiros": {
+        "address": "Medjimurska 19",
+        "contact_number": "+385 99 1234 567",
+        "contact_mail": "axiros@example.com"
     }
 }

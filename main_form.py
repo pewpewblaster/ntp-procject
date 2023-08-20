@@ -30,7 +30,7 @@ from show_image_form import Ui_Form
 from report_form import Report_Form
 from http_client_form import Ui_download_client
 from soap_client_form import Ui_soap_client
-
+from rest_client_form import Ui_rest_client
 # imports for RTF and PDF
 import os
 from datetime import datetime
@@ -839,7 +839,7 @@ class Ui_MainWindow(QMainWindow):
         self.button_rest_client = QtWidgets.QPushButton(parent=self.centralwidget)
         self.button_rest_client.setGeometry(QtCore.QRect(470, 20, 131, 23))
         self.button_rest_client.setObjectName("pushButton")
-        # self.button_rest_client.clicked.connect(self.open_rest_client)
+        self.button_rest_client.clicked.connect(self.open_rest_client)
         
         # part that calls localisation function (def retranslateUi(self, MainWindow))
         self.retranslateUi(MainWindow)
@@ -862,6 +862,12 @@ class Ui_MainWindow(QMainWindow):
         
 
     ''' Custom funkcije  '''
+    
+    def open_rest_client(self):
+        self.main_window = QtWidgets.QMainWindow()
+        self.soap_client = Ui_rest_client()
+        self.soap_client.setupUi(self.main_window, self.signed_user)
+        self.main_window.show()
     
     def open_soap_client(self):
         self.main_window = QtWidgets.QMainWindow()
