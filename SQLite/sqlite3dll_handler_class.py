@@ -7,7 +7,6 @@ from io import StringIO
 
 
 class JwtDatabaseManager():
-
     def __init__(self):
         self.db_path = os.path.join("..", "db", "jwt_database.db")
         self.dll_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sqlite3.dll")
@@ -90,10 +89,6 @@ class JwtDatabaseManager():
             else:
                 return 0
             
-            
-            
-
-
         sqlite3DLL = ctypes.CDLL(self.dll_path)
         SQLITE_OPEN_READONLY = 1 
         null_ptr = ctypes.c_void_p(None)
