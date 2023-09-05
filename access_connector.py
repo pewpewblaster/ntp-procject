@@ -1,4 +1,5 @@
 import pyodbc
+from salt_pepper.password_hesher import verify_password
 
 # connector for user credenitals databse
 def user_database():
@@ -154,23 +155,36 @@ def change_password(username_for_password_changing, new_password):
 
 
 # function for checking if username and password match at login
-def check_credentials(username, password):
+def check_credentials(username, input_password):
+    
+    
     connection_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};DBQ=db/users.accdb;'
     database_users = pyodbc.connect(connection_string)
     
     query = database_users.cursor()
-    query.execute("SELECT username, password FROM credentials WHERE username=? AND password=?", username, password)
-    users = query.fetchone()
-    
+    # query.execute("SELECT username, password FROM credentials WHERE username=? AND password=?", username, password)
+    # users = query.fetchone()
+
+    query.execute("SELECT password FROM credentials WHERE username=? ", username)
+    query_password = query.fetchall()
     query.close()
     database_users.close()
     
-    if users is not None:
-        print("Credentials found in the database.")
+    password_to_verify = query_password[0][0]
+
+    if verify_password(password_to_verify, input_password) == True:
+        print("Credentials found in the database. Hashed password decoded.")
         return True
     else:
         print("Credentials not found in the database.")
         return False
+    
+    # if users is not None:
+    #     print("Credentials found in the database.")
+    #     return True
+    # else:
+    #     print("Credentials not found in the database.")
+    #     return False
 
 # funkcija za kreiranje novog usera na formi create_user_form.py
 def create_new_user(username, password):

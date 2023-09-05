@@ -75,11 +75,12 @@ class Ui_rest_client(object):
             except requests.exceptions.ConnectionError:
                 print("Connection to the REST server failed.")
                 
-    def setupUi(self, rest_client, username):
+    def setupUi(self, rest_client, username, language):
         rest_client.setObjectName("rest_client")
         rest_client.setFixedSize(669, 442)
         
         self.logged_user = username
+        self.selected_language = language
         
         self.textBrowser = QtWidgets.QTextBrowser(parent=rest_client)
         self.textBrowser.setGeometry(QtCore.QRect(20, 20, 331, 401))
@@ -184,15 +185,70 @@ class Ui_rest_client(object):
             print(f"An unexpected error occurred: {e}")
         
     def retranslateUi(self, rest_client):
-        _translate = QtCore.QCoreApplication.translate
-        rest_client.setWindowTitle(_translate("rest_client", "Rest client"))
-        self.groupBox_logistic_partners.setTitle(_translate("rest_client", "Logistic partners"))
-        self.pushButton_show_logistic_partners.setText(_translate("rest_client", "Show"))
-        self.pushButton_add_logistic_partners.setText(_translate("rest_client", "Add"))
-        self.label_partnert_name.setText(_translate("rest_client", "Partner name"))
-        self.label_address.setText(_translate("rest_client", "Address"))
-        self.label_contact_number.setText(_translate("rest_client", "Contact number"))
-        self.label_contact_email.setText(_translate("rest_client", "Contact e-mail"))
-        self.groupBox_admin_only.setTitle(_translate("rest_client", "Admin only - show logistic API informations"))
-        self.pushButton_admin_only.setText(_translate("rest_client", "Show"))
+        if self.selected_language == "English":
+            _translate = QtCore.QCoreApplication.translate
+            rest_client.setWindowTitle(_translate("rest_client", "Rest client"))
+            self.groupBox_logistic_partners.setTitle(_translate("rest_client", "Logistic partners"))
+            self.pushButton_show_logistic_partners.setText(_translate("rest_client", "Show"))
+            self.pushButton_add_logistic_partners.setText(_translate("rest_client", "Add"))
+            self.label_partnert_name.setText(_translate("rest_client", "Partner name"))
+            self.label_address.setText(_translate("rest_client", "Address"))
+            self.label_contact_number.setText(_translate("rest_client", "Contact number"))
+            self.label_contact_email.setText(_translate("rest_client", "Contact e-mail"))
+            self.groupBox_admin_only.setTitle(_translate("rest_client", "Admin only - show logistic API informations"))
+            self.pushButton_admin_only.setText(_translate("rest_client", "Show"))
+
+        if self.selected_language == "Croatian":
+            _translate = QtCore.QCoreApplication.translate
+            rest_client.setWindowTitle(_translate("rest_client", "REST klijent"))
+            self.groupBox_logistic_partners.setTitle(_translate("rest_client", "Logistički partneri"))
+            self.pushButton_show_logistic_partners.setText(_translate("rest_client", "Prikaži"))
+            self.pushButton_add_logistic_partners.setText(_translate("rest_client", "Dodaj"))
+            self.label_partnert_name.setText(_translate("rest_client", "Naziv partnera"))
+            self.label_address.setText(_translate("rest_client", "Adresa"))
+            self.label_contact_number.setText(_translate("rest_client", "Kontakt broj"))
+            self.label_contact_email.setText(_translate("rest_client", "Kontakt e-pošta"))
+            self.groupBox_admin_only.setTitle(_translate("rest_client", "Samo za administratore - prikaži informacije o logističkom API-ju"))
+            self.pushButton_admin_only.setText(_translate("rest_client", "Prikaži"))
+            
+        if self.selected_language == "German":
+            _translate = QtCore.QCoreApplication.translate
+            rest_client.setWindowTitle(_translate("rest_client", "REST-Client"))
+            self.groupBox_logistic_partners.setTitle(_translate("rest_client", "Logistikpartner"))
+            self.pushButton_show_logistic_partners.setText(_translate("rest_client", "Anzeigen"))
+            self.pushButton_add_logistic_partners.setText(_translate("rest_client", "Hinzufügen"))
+            self.label_partnert_name.setText(_translate("rest_client", "Name des Partners"))
+            self.label_address.setText(_translate("rest_client", "Adresse"))
+            self.label_contact_number.setText(_translate("rest_client", "Kontaktnummer"))
+            self.label_contact_email.setText(_translate("rest_client", "Kontakt-E-Mail"))
+            self.groupBox_admin_only.setTitle(_translate("rest_client", "Nur für Administratoren - Zeige logistische API-Informationen"))
+            self.pushButton_admin_only.setText(_translate("rest_client", "Anzeigen"))
+
+
+        if self.selected_language == "Spanish":
+            _translate = QtCore.QCoreApplication.translate
+            rest_client.setWindowTitle(_translate("rest_client", "Cliente REST"))
+            self.groupBox_logistic_partners.setTitle(_translate("rest_client", "Socios logísticos"))
+            self.pushButton_show_logistic_partners.setText(_translate("rest_client", "Mostrar"))
+            self.pushButton_add_logistic_partners.setText(_translate("rest_client", "Agregar"))
+            self.label_partnert_name.setText(_translate("rest_client", "Nombre del socio"))
+            self.label_address.setText(_translate("rest_client", "Dirección"))
+            self.label_contact_number.setText(_translate("rest_client", "Número de contacto"))
+            self.label_contact_email.setText(_translate("rest_client", "Correo electrónico de contacto"))
+            self.groupBox_admin_only.setTitle(_translate("rest_client", "Solo para administradores - Mostrar información del API logístico"))
+            self.pushButton_admin_only.setText(_translate("rest_client", "Mostrar"))
+
+
+        if self.selected_language == "French":
+            _translate = QtCore.QCoreApplication.translate
+            rest_client.setWindowTitle(_translate("rest_client", "Client REST"))
+            self.groupBox_logistic_partners.setTitle(_translate("rest_client", "Partenaires logistiques"))
+            self.pushButton_show_logistic_partners.setText(_translate("rest_client", "Afficher"))
+            self.pushButton_add_logistic_partners.setText(_translate("rest_client", "Ajouter"))
+            self.label_partnert_name.setText(_translate("rest_client", "Nom du partenaire"))
+            self.label_address.setText(_translate("rest_client", "Adresse"))
+            self.label_contact_number.setText(_translate("rest_client", "Numéro de contact"))
+            self.label_contact_email.setText(_translate("rest_client", "E-mail de contact"))
+            self.groupBox_admin_only.setTitle(_translate("rest_client", "Réservé aux administrateurs - Afficher les informations de l'API logistique"))
+            self.pushButton_admin_only.setText(_translate("rest_client", "Afficher"))
 

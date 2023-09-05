@@ -54,11 +54,11 @@ class DownloadThread(QtCore.QThread):
             self.download_complete.emit()
             
 class Ui_download_client(object):
-    def setupUi(self, download_client):
+    def setupUi(self, download_client, language):
         download_client.setObjectName("download_client")
         download_client.setFixedSize(310, 317)
         self.download_thread = None
-
+        self.selected_language = language
         
         """ labels """
         self.label_url = QtWidgets.QLabel(parent=download_client)
@@ -186,19 +186,83 @@ class Ui_download_client(object):
         print("Download stopped.")
         
     def retranslateUi(self, download_client):
-        _translate = QtCore.QCoreApplication.translate
-        download_client.setWindowTitle(_translate("download_client", "Download cilent"))
-        self.label_url.setText(_translate("download_client", "Enter url here:"))
-        self.label_speed.setText(_translate("download_client", "Speed limit in KB/s:"))
-        self.button_250_kbps.setText(_translate("download_client", "250 KB/s"))
-        self.button_500_kbps.setText(_translate("download_client", "500 KB/s"))
-        self.button_1_mbps.setText(_translate("download_client", "1 MB/s"))
-        self.label_progress.setText(_translate("download_client", "Progress:"))
-        self.label_download_speed.setText(_translate("download_client", "Download speed:"))
-        # self.label_percentage.setText(_translate("download_client", "Percentage:"))
-        self.label_downloaded.setText(_translate("download_client", "Downloaded:"))
-        # self.label_percentage_show.setText(_translate("download_client", "None"))
-        self.label_download_speed_show_2.setText(_translate("download_client", "None"))
-        self.label_download_speed_show.setText(_translate("download_client", "None"))
-        self.pushButton_download.setText(_translate("download_client", "Download"))
-        self.pushButton_stop_download.setText(_translate("download_client", "Stop Download"))
+        
+        if self.selected_language == "English":
+            _translate = QtCore.QCoreApplication.translate
+            download_client.setWindowTitle(_translate("download_client", "Download cilent"))
+            self.label_url.setText(_translate("download_client", "Enter url here:"))
+            self.label_speed.setText(_translate("download_client", "Speed limit in KB/s:"))
+            self.button_250_kbps.setText(_translate("download_client", "250 KB/s"))
+            self.button_500_kbps.setText(_translate("download_client", "500 KB/s"))
+            self.button_1_mbps.setText(_translate("download_client", "1 MB/s"))
+            self.label_progress.setText(_translate("download_client", "Progress:"))
+            self.label_download_speed.setText(_translate("download_client", "Download speed:"))
+            self.label_downloaded.setText(_translate("download_client", "Downloaded:"))
+            self.label_download_speed_show_2.setText(_translate("download_client", "None"))
+            self.label_download_speed_show.setText(_translate("download_client", "None"))
+            self.pushButton_download.setText(_translate("download_client", "Download"))
+            self.pushButton_stop_download.setText(_translate("download_client", "Stop Download"))
+            
+        if self.selected_language == "Croatian":
+            _translate = QtCore.QCoreApplication.translate
+            download_client.setWindowTitle(_translate("download_client", "Klijent za preuzimanje"))
+            self.label_url.setText(_translate("download_client", "Unesite URL ovdje:"))
+            self.label_speed.setText(_translate("download_client", "Ograničenje brzine u KB/s:"))
+            self.button_250_kbps.setText(_translate("download_client", "250 KB/s"))
+            self.button_500_kbps.setText(_translate("download_client", "500 KB/s"))
+            self.button_1_mbps.setText(_translate("download_client", "1 MB/s"))
+            self.label_progress.setText(_translate("download_client", "Napredak:"))
+            self.label_download_speed.setText(_translate("download_client", "Brzina preuzimanja:"))
+            self.label_downloaded.setText(_translate("download_client", "Preuzeto:"))
+            self.label_download_speed_show_2.setText(_translate("download_client", "Nema"))
+            self.label_download_speed_show.setText(_translate("download_client", "Nema"))
+            self.pushButton_download.setText(_translate("download_client", "Preuzmi"))
+            self.pushButton_stop_download.setText(_translate("download_client", "Zaustavi preuzimanje"))
+
+        if self.selected_language == "German":
+            _translate = QtCore.QCoreApplication.translate
+            download_client.setWindowTitle(_translate("download_client", "Download-Client"))
+            self.label_url.setText(_translate("download_client", "URL hier eingeben:"))
+            self.label_speed.setText(_translate("download_client", "Geschwindigkeitsbegrenzung in KB/s:"))
+            self.button_250_kbps.setText(_translate("download_client", "250 KB/s"))
+            self.button_500_kbps.setText(_translate("download_client", "500 KB/s"))
+            self.button_1_mbps.setText(_translate("download_client", "1 MB/s"))
+            self.label_progress.setText(_translate("download_client", "Fortschritt:"))
+            self.label_download_speed.setText(_translate("download_client", "Download-Geschwindigkeit:"))
+            self.label_downloaded.setText(_translate("download_client", "Heruntergeladen:"))
+            self.label_download_speed_show_2.setText(_translate("download_client", "Keine"))
+            self.label_download_speed_show.setText(_translate("download_client", "Keine"))
+            self.pushButton_download.setText(_translate("download_client", "Download"))
+            self.pushButton_stop_download.setText(_translate("download_client", "Download abbrechen"))
+
+        if self.selected_language == "Spanish":
+            _translate = QtCore.QCoreApplication.translate
+            download_client.setWindowTitle(_translate("download_client", "Cliente de descarga"))
+            self.label_url.setText(_translate("download_client", "Ingrese la URL aquí:"))
+            self.label_speed.setText(_translate("download_client", "Límite de velocidad en KB/s:"))
+            self.button_250_kbps.setText(_translate("download_client", "250 KB/s"))
+            self.button_500_kbps.setText(_translate("download_client", "500 KB/s"))
+            self.button_1_mbps.setText(_translate("download_client", "1 MB/s"))
+            self.label_progress.setText(_translate("download_client", "Progreso:"))
+            self.label_download_speed.setText(_translate("download_client", "Velocidad de descarga:"))
+            self.label_downloaded.setText(_translate("download_client", "Descargado:"))
+            self.label_download_speed_show_2.setText(_translate("download_client", "Ninguna"))
+            self.label_download_speed_show.setText(_translate("download_client", "Ninguna"))
+            self.pushButton_download.setText(_translate("download_client", "Descargar"))
+            self.pushButton_stop_download.setText(_translate("download_client", "Detener descarga"))
+           
+        if self.selected_language == "French":
+            _translate = QtCore.QCoreApplication.translate
+            download_client.setWindowTitle(_translate("download_client", "Client de téléchargement"))
+            self.label_url.setText(_translate("download_client", "Entrez l'URL ici :"))
+            self.label_speed.setText(_translate("download_client", "Limite de vitesse en Ko/s :"))
+            self.button_250_kbps.setText(_translate("download_client", "250 Ko/s"))
+            self.button_500_kbps.setText(_translate("download_client", "500 Ko/s"))
+            self.button_1_mbps.setText(_translate("download_client", "1 Mo/s"))
+            self.label_progress.setText(_translate("download_client", "Progression :"))
+            self.label_download_speed.setText(_translate("download_client", "Vitesse de téléchargement :"))
+            self.label_downloaded.setText(_translate("download_client", "Téléchargé :"))
+            self.label_download_speed_show_2.setText(_translate("download_client", "Aucune"))
+            self.label_download_speed_show.setText(_translate("download_client", "Aucune"))
+            self.pushButton_download.setText(_translate("download_client", "Télécharger"))
+            self.pushButton_stop_download.setText(_translate("download_client", "Arrêter le téléchargement"))

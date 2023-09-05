@@ -3,10 +3,11 @@ from PyQt6 import QtCore, QtWidgets
 from datetime import datetime
 
 class Report_Form(object):
-    def setupUi(self, Form, product_data, master_detail_data):
+    def setupUi(self, Form, product_data, master_detail_data, language):
         Form.setObjectName("Reprot Form")
         Form.resize(640, 801)
         
+        self.selected_language = language
         self.product_data = product_data
         self.master_detail_data = master_detail_data
         
@@ -25,30 +26,6 @@ class Report_Form(object):
 
         # for both text browsers set scroll bar at the start/top
         self.textBrowser_warehouse_product.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        
-
-        data_dict = {
-            "glossary": {
-                "title": "example glossary",
-                "GlossDiv": {
-                    "title": "S",
-                    "GlossList": {
-                        "GlossEntry": {
-                            "ID": "SGML",
-                            "SortAs": "SGML",
-                            "GlossTerm": "Standard Generalized Markup Language",
-                            "Acronym": "SGML",
-                            "Abbrev": "ISO 8879:1986",
-                            "GlossDef": {
-                                "para": "A meta-markup language, used to create markup languages such as DocBook.",
-                                "GlossSeeAlso": ["GML", "XML"]
-                            },
-                            "GlossSee": "markup"
-                        }
-                    }
-                }
-            }
-        }
         
         self.date_of_report = datetime.now().strftime('%Y-%m-%d')
         
@@ -154,11 +131,34 @@ class Report_Form(object):
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def retranslateUi(self, Form):
-        _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.label_product.setText(_translate("Form", "Table Product report"))
-        self.label_warehouse_product.setText(_translate("Form", "Table Warehouse-Product Report"))
+        if self.selected_language == "English":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Form"))
+            self.label_product.setText(_translate("Form", "Table Product report"))
+            self.label_warehouse_product.setText(_translate("Form", "Table Warehouse-Product Report"))
 
-    # Display the dictionary in the first text browser
+        if self.selected_language == "Croatian":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Obrazac"))
+            self.label_product.setText(_translate("Form", "Izvješće o proizvodima"))
+            self.label_warehouse_product.setText(_translate("Form", "Izvješće o skladištu i proizvodima"))
+            
+        if self.selected_language == "German":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Formular"))
+            self.label_product.setText(_translate("Form", "Produktbericht"))
+            self.label_warehouse_product.setText(_translate("Form", "Lager-Produktbericht"))
+            
+        if self.selected_language == "Spanish":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Formulario"))
+            self.label_product.setText(_translate("Form", "Informe de Producto"))
+            self.label_warehouse_product.setText(_translate("Form", "Informe de Almacén-Producto"))
+            
+        if self.selected_language == "French":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Formulaire"))
+            self.label_product.setText(_translate("Form", "Rapport de Produit"))
+            self.label_warehouse_product.setText(_translate("Form", "Rapport d'Entrepôt-Produit"))
 
 

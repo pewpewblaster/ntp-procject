@@ -107,9 +107,9 @@ class JwtDatabaseManager():
         
         return self.jwt_token
 
-class_object = JwtDatabaseManager()
-token = class_object.get_jwt_for_username("admin")
-print(token)
+# class_object = JwtDatabaseManager()
+# token = class_object.get_jwt_for_username("admin")
+# print(token)
 # db_path = "../db/jwt_database.db"
 # dll_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sqlite3.dll")
 

@@ -4,7 +4,7 @@ from main_form import Ui_MainWindow
 from create_user_form import Ui_Form
 from winreg_utils import win_reg_app_data
 from SQLite.sqlite3dll_handler_class import JwtDatabaseManager
-import json, requests, os
+import json, requests
 
 ''' global variable'''
 
@@ -20,6 +20,8 @@ class login_form(object):
     def login_ui(self, Form):
         self.Form = Form
         Form.setObjectName("Form")
+        
+        self.selected_language = None
         
         # login button
         self.login_button = QtWidgets.QPushButton(parent=Form)
@@ -102,45 +104,19 @@ class login_form(object):
             if self.win_reg_settings["default_language"] not in supported_languages:
                 self.language_select(Form, "English", True)
             self.language_select(Form, self.win_reg_settings["default_language"], True)
+            self.selected_language = self.win_reg_settings["default_language"]
 
     def open_create_user_form(self):
         self.main_window = QtWidgets.QMainWindow()
         self.create_user = Ui_Form()
-        self.create_user.setupUi(self.main_window)
+        self.create_user.setupUi(self.main_window, self.selected_language)
         self.main_window.show()
       
     def open_settings(self):
         pass 
-
-    # def login(self):
-    #     if check_credentials(self.edit_username.text(), self.edit_password.text()):
-            
-    #         # get JWT token
-    #         rest_server_url = "https://127.0.0.1:443/api/"
-    #         endpoint = "get_token"
-    #         header =  {'Username': self.edit_username.text()}
-    #         response = requests.get(rest_server_url + endpoint, headers=header, verify=False)
-    #         json_response = json.loads(response.text)
-    #         jtw_token = json_response.get("jwt_token")
-    #         print(f"JWT: {jtw_token}")
-    #         print(f"Type of JWT: {type(jtw_token)}")
-    #         # save token to the SQLite databse "db/jwt_database.db"
-    #         sqlite_handler = JwtDatabaseManager()
-    #         # 1st argument DB path
-    #         # 2nd argument DLL path
-    #         # 3rd argument username
-    #         # 4th argument JWT token
-    #         sqlite_handler.update_or_insert_jwt(self.edit_username.text(), jtw_token)
-            
-    #         self.main_window = QtWidgets.QMainWindow()
-    #         self.ui = Ui_MainWindow()
-    #         self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
-    #         self.main_window.show()
-    #         self.Form.close()
-    #     else:
-    #         QtWidgets.QMessageBox.warning(self.Form, "Login Failed", "Invalid username or password.")
     
     def login(self):
+        
         if check_credentials(self.edit_username.text(), self.edit_password.text()):
             try:
                 rest_server_url = "https://nitroblaze.pythonanywhere.com/"

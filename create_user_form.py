@@ -8,15 +8,16 @@
 
 from PyQt6 import QtCore, QtWidgets
 from access_connector import create_new_user, user_database, delete_user_from_database, change_password
-
+from salt_pepper.password_hesher import generate_salt, generate_pepper, hash_password_sha256, verify_password
 ''' global variables'''
 
 ''' classes '''
 class Ui_Form(object):
-    def setupUi(self, Form):
+    def setupUi(self, Form, language):
         Form.setObjectName("Form")
         Form.resize(619, 406)
         self.Form = Form
+        self.selected_language = language
         
         # group box create user
         self.group_box_create_user = QtWidgets.QGroupBox(parent=Form)
@@ -102,16 +103,24 @@ class Ui_Form(object):
     def password_change(self):
         confirmation_message = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Question, "Warning!", "Are you sure you want to change the password?", QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No, self.Form)
         confirmation_result = confirmation_message.exec()
+        
+        self.new_password = self.edit_password_change.text()
+        self.new_password_heshed = hash_password_sha256(self.new_password)
+        
     
         if confirmation_result == QtWidgets.QMessageBox.StandardButton.Yes:
-            if change_password(self.edit_username_change.text(), self.edit_password_change.text()):
+            if change_password(self.edit_username_change.text(), self.new_password_heshed):
                 QtWidgets.QMessageBox.warning(self.Form, "Success", "Password changed!")
             else:
                 QtWidgets.QMessageBox.warning(self.Form, "Error", "Wrong username")
             
             
     def create_new_user(self):
-        if create_new_user(self.line_edit_username.text(), self.line_edit_password.text()):
+        
+        self.new_password = self.line_edit_password.text()
+        self.new_password_heshed = hash_password_sha256(self.new_password)
+        
+        if create_new_user(self.line_edit_username.text(), self.new_password_heshed):
             QtWidgets.QMessageBox.warning(self.Form, "Success", "User created.")
         else:
             QtWidgets.QMessageBox.warning(self.Form, "Error", "User already exists!")
@@ -144,18 +153,88 @@ class Ui_Form(object):
             
     
     def retranslateUi(self, Form):
-        _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.group_box_create_user.setTitle(_translate("Form", "Create new user"))
-        self.button_create.setText(_translate("Form", "Create new user"))
-        self.label_username.setText(_translate("Form", "Username"))
-        self.label_password.setText(_translate("Form", "Password"))
-        self.group_box_change_password.setTitle(_translate("Form", "Change password"))
-        self.label_change_username.setText(_translate("Form", "Username"))
-        self.label_change_password.setText(_translate("Form", "New Password"))
-        self.button_change_password.setText(_translate("Form", "Change password"))
-        self.group_box_delete_users.setTitle(_translate("Form", "Delete users"))
-        self.label_delete_user.setText(_translate("Form", "Username"))
-        self.button_delete_user.setText(_translate("Form", "Delete user"))
-        self.group_box_created_users.setTitle(_translate("Form", "Created users"))
-        self.button_show_users.setText("Show users")
+        
+        if self.selected_language == "English":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Form"))
+            self.group_box_create_user.setTitle(_translate("Form", "Create new user"))
+            self.button_create.setText(_translate("Form", "Create new user"))
+            self.label_username.setText(_translate("Form", "Username"))
+            self.label_password.setText(_translate("Form", "Password"))
+            self.group_box_change_password.setTitle(_translate("Form", "Change password"))
+            self.label_change_username.setText(_translate("Form", "Username"))
+            self.label_change_password.setText(_translate("Form", "New Password"))
+            self.button_change_password.setText(_translate("Form", "Change password"))
+            self.group_box_delete_users.setTitle(_translate("Form", "Delete users"))
+            self.label_delete_user.setText(_translate("Form", "Username"))
+            self.button_delete_user.setText(_translate("Form", "Delete user"))
+            self.group_box_created_users.setTitle(_translate("Form", "Created users"))
+            self.button_show_users.setText("Show users")
+            
+        if self.selected_language == "French":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Formulaire"))
+            self.group_box_create_user.setTitle(_translate("Form", "Créer un nouvel utilisateur"))
+            self.button_create.setText(_translate("Form", "Créer un nouvel utilisateur"))
+            self.label_username.setText(_translate("Form", "Nom d'utilisateur"))
+            self.label_password.setText(_translate("Form", "Mot de passe"))
+            self.group_box_change_password.setTitle(_translate("Form", "Modifier le mot de passe"))
+            self.label_change_username.setText(_translate("Form", "Nom d'utilisateur"))
+            self.label_change_password.setText(_translate("Form", "Nouveau mot de passe"))
+            self.button_change_password.setText(_translate("Form", "Modifier le mot de passe"))
+            self.group_box_delete_users.setTitle(_translate("Form", "Supprimer des utilisateurs"))
+            self.label_delete_user.setText(_translate("Form", "Nom d'utilisateur"))
+            self.button_delete_user.setText(_translate("Form", "Supprimer l'utilisateur"))
+            self.group_box_created_users.setTitle(_translate("Form", "Utilisateurs créés"))
+            self.button_show_users.setText("Afficher les utilisateurs")
+            
+        if self.selected_language == "Croatian":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Obrazac"))
+            self.group_box_create_user.setTitle(_translate("Form", "Stvorite novog korisnika"))
+            self.button_create.setText(_translate("Form", "Stvorite novog korisnika"))
+            self.label_username.setText(_translate("Form", "Korisničko ime"))
+            self.label_password.setText(_translate("Form", "Lozinka"))
+            self.group_box_change_password.setTitle(_translate("Form", "Promijenite lozinku"))
+            self.label_change_username.setText(_translate("Form", "Korisničko ime"))
+            self.label_change_password.setText(_translate("Form", "Nova lozinka"))
+            self.button_change_password.setText(_translate("Form", "Promijenite lozinku"))
+            self.group_box_delete_users.setTitle(_translate("Form", "Izbrišite korisnike"))
+            self.label_delete_user.setText(_translate("Form", "Korisničko ime"))
+            self.button_delete_user.setText(_translate("Form", "Izbrišite korisnika"))
+            self.group_box_created_users.setTitle(_translate("Form", "Stvoreni korisnici"))
+            self.button_show_users.setText(_translate("Form", "Prikaži korisnike"))
+
+        if self.selected_language == "German":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Formular"))
+            self.group_box_create_user.setTitle(_translate("Form", "Neuen Benutzer erstellen"))
+            self.button_create.setText(_translate("Form", "Neuen Benutzer erstellen"))
+            self.label_username.setText(_translate("Form", "Benutzername"))
+            self.label_password.setText(_translate("Form", "Passwort"))
+            self.group_box_change_password.setTitle(_translate("Form", "Passwort ändern"))
+            self.label_change_username.setText(_translate("Form", "Benutzername"))
+            self.label_change_password.setText(_translate("Form", "Neues Passwort"))
+            self.button_change_password.setText(_translate("Form", "Passwort ändern"))
+            self.group_box_delete_users.setTitle(_translate("Form", "Benutzer löschen"))
+            self.label_delete_user.setText(_translate("Form", "Benutzername"))
+            self.button_delete_user.setText(_translate("Form", "Benutzer löschen"))
+            self.group_box_created_users.setTitle(_translate("Form", "Erstellte Benutzer"))
+            self.button_show_users.setText(_translate("Form", "Benutzer anzeigen"))
+
+        if self.selected_language == "Spanish":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Formulario"))
+            self.group_box_create_user.setTitle(_translate("Form", "Crear nuevo usuario"))
+            self.button_create.setText(_translate("Form", "Crear nuevo usuario"))
+            self.label_username.setText(_translate("Form", "Nombre de usuario"))
+            self.label_password.setText(_translate("Form", "Contraseña"))
+            self.group_box_change_password.setTitle(_translate("Form", "Cambiar contraseña"))
+            self.label_change_username.setText(_translate("Form", "Nombre de usuario"))
+            self.label_change_password.setText(_translate("Form", "Nueva contraseña"))
+            self.button_change_password.setText(_translate("Form", "Cambiar contraseña"))
+            self.group_box_delete_users.setTitle(_translate("Form", "Eliminar usuarios"))
+            self.label_delete_user.setText(_translate("Form", "Nombre de usuario"))
+            self.button_delete_user.setText(_translate("Form", "Eliminar usuario"))
+            self.group_box_created_users.setTitle(_translate("Form", "Usuarios creados"))
+            self.button_show_users.setText(_translate("Form", "Mostrar usuarios"))

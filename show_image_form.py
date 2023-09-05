@@ -2,10 +2,11 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 
 
 class Ui_Form(object):
-    def setupUi(self, Form, image_binary):
+    def setupUi(self, Form, image_binary, language):
         Form.setObjectName("Form")
         Form.resize(361, 481)
         
+        self.selected_language = language
         self.image_binary = image_binary
         
         self.grup_box_frame_show_Image = QtWidgets.QGroupBox(parent=Form)
@@ -47,10 +48,35 @@ class Ui_Form(object):
         QtWidgets.QApplication.instance().activeWindow().close()
     
     def retranslateUi(self, Form):
-        _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Form"))
-        self.grup_box_frame_show_Image.setTitle(_translate("Form", "GroupBox"))
-        self.button_close_window.setText(_translate("Form", "Close"))
+        if self.selected_language == "English":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Form"))
+            self.grup_box_frame_show_Image.setTitle(_translate("Form", "Product image"))
+            self.button_close_window.setText(_translate("Form", "Close"))
+            
+        if self.selected_language == "Croatian":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Form"))
+            self.grup_box_frame_show_Image.setTitle(_translate("Form", "Slika proizvoda"))
+            self.button_close_window.setText(_translate("Form", "Zatvori"))
+            
+        if self.selected_language == "German":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Form"))
+            self.grup_box_frame_show_Image.setTitle(_translate("Form", "Produktbild"))
+            self.button_close_window.setText(_translate("Form", "Schließen"))
+            
+        if self.selected_language == "Spanish":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Formulario"))
+            self.grup_box_frame_show_Image.setTitle(_translate("Form", "Imagen de producto"))
+            self.button_close_window.setText(_translate("Form", "Cerrar"))
+            
+        if self.selected_language == "French":
+            _translate = QtCore.QCoreApplication.translate
+            Form.setWindowTitle(_translate("Form", "Formulaire"))
+            self.grup_box_frame_show_Image.setTitle(_translate("Form", "Image du produit"))
+            self.button_close_window.setText(_translate("Form", "Fermer"))
 
 
 

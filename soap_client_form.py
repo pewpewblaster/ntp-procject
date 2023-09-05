@@ -42,9 +42,11 @@ class Ui_soap_client(object):
         def return_request_data(self):
             return self.response.text, self.response_status_code
             
-    def setupUi(self, soap_client):
+    def setupUi(self, soap_client, language):
         soap_client.setObjectName("soap_client")
         soap_client.setFixedSize(707, 377)
+        
+        self.selected_language = language
         
         self.list_country_codes = [
             "Croatia - HR",
@@ -148,11 +150,56 @@ class Ui_soap_client(object):
         msg_box.exec()
         
     def retranslateUi(self, soap_client):
-        _translate = QtCore.QCoreApplication.translate
-        soap_client.setWindowTitle(_translate("soap_client", "SOAP client"))
-        self.label_country_codes.setText(_translate("soap_client", "Country codes:"))
-        self.label_enter_country_code.setText(_translate("soap_client", "Enter country code:"))
-        self.pushButton_send_request.setText(_translate("soap_client", "Send request"))
-        self.label_request_code.setText(_translate("soap_client", "Status code:"))
-        self.label_show_request_code.setText(_translate("soap_client", "None"))
-        self.label.setText(_translate("soap_client", "SOAP message:"))
+        
+        if self.selected_language == "English": 
+            _translate = QtCore.QCoreApplication.translate
+            soap_client.setWindowTitle(_translate("soap_client", "SOAP client"))
+            self.label_country_codes.setText(_translate("soap_client", "Country codes:"))
+            self.label_enter_country_code.setText(_translate("soap_client", "Enter country code:"))
+            self.pushButton_send_request.setText(_translate("soap_client", "Send request"))
+            self.label_request_code.setText(_translate("soap_client", "Status code:"))
+            self.label_show_request_code.setText(_translate("soap_client", "None"))
+            self.label.setText(_translate("soap_client", "SOAP message:"))
+            
+        if self.selected_language == "Croatian":
+            _translate = QtCore.QCoreApplication.translate
+            soap_client.setWindowTitle(_translate("soap_client", "SOAP klijent"))
+            self.label_country_codes.setText(_translate("soap_client", "Šifre zemalja:"))
+            self.label_enter_country_code.setText(_translate("soap_client", "Unesite šifru zemlje:"))
+            self.pushButton_send_request.setText(_translate("soap_client", "Pošaljite zahtjev"))
+            self.label_request_code.setText(_translate("soap_client", "Statusna šifra:"))
+            self.label_show_request_code.setText(_translate("soap_client", "Nema"))
+            self.label.setText(_translate("soap_client", "SOAP poruka:"))
+
+        if self.selected_language == "German":
+            _translate = QtCore.QCoreApplication.translate
+            soap_client.setWindowTitle(_translate("soap_client", "SOAP-Client"))
+            self.label_country_codes.setText(_translate("soap_client", "Ländercodes:"))
+            self.label_enter_country_code.setText(_translate("soap_client", "Geben Sie den Ländercode ein:"))
+            self.pushButton_send_request.setText(_translate("soap_client", "Anfrage senden"))
+            self.label_request_code.setText(_translate("soap_client", "Statuscode:"))
+            self.label_show_request_code.setText(_translate("soap_client", "Keine"))
+            self.label.setText(_translate("soap_client", "SOAP-Nachricht:"))
+
+
+        if self.selected_language == "Spanish":
+            _translate = QtCore.QCoreApplication.translate
+            soap_client.setWindowTitle(_translate("soap_client", "Cliente SOAP"))
+            self.label_country_codes.setText(_translate("soap_client", "Códigos de país:"))
+            self.label_enter_country_code.setText(_translate("soap_client", "Ingrese el código de país:"))
+            self.pushButton_send_request.setText(_translate("soap_client", "Enviar solicitud"))
+            self.label_request_code.setText(_translate("soap_client", "Código de estado:"))
+            self.label_show_request_code.setText(_translate("soap_client", "Ninguno"))
+            self.label.setText(_translate("soap_client", "Mensaje SOAP:"))
+
+
+        if self.selected_language == "French":
+            _translate = QtCore.QCoreApplication.translate
+            soap_client.setWindowTitle(_translate("soap_client", "Client SOAP"))
+            self.label_country_codes.setText(_translate("soap_client", "Codes pays :"))
+            self.label_enter_country_code.setText(_translate("soap_client", "Entrez le code pays :"))
+            self.pushButton_send_request.setText(_translate("soap_client", "Envoyer la demande"))
+            self.label_request_code.setText(_translate("soap_client", "Code de statut :"))
+            self.label_show_request_code.setText(_translate("soap_client", "Aucun"))
+            self.label.setText(_translate("soap_client", "Message SOAP :"))
+      
