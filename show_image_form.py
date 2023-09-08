@@ -1,11 +1,36 @@
 from PyQt6 import QtCore, QtWidgets, QtGui
+from PyQt6.QtGui import QFont, QPalette, QColor
+
 
 
 class Ui_Form(object):
-    def setupUi(self, Form, image_binary, language):
+    def setupUi(self, Form,
+                image_binary,
+                language,
+                app_settings):
+    
         Form.setObjectName("Form")
         Form.resize(361, 481)
+        self.form = Form
+        self.app_settings = app_settings
         
+        
+        """Application settings"""
+        font = QFont(self.app_settings["font_name"],
+                     self.app_settings["font_size"])
+        self.form.setFont(font)
+
+        palette = QPalette()
+        # font color
+        palette.setColor(QPalette.ColorRole.WindowText,
+                         QColor(*self.app_settings["font_color"]))
+        # background color
+        palette.setColor(QPalette.ColorRole.Window, 
+                         QColor(*self.app_settings["background_color"]))
+        self.form.setPalette(palette)   
+        
+        
+        """ GUI """
         self.selected_language = language
         self.image_binary = image_binary
         

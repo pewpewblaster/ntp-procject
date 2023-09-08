@@ -9,6 +9,7 @@
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtGui import QFont, QPalette, QColor
 # database manipulation imports
 from access_connector import (import_product,
                               get_table, 
@@ -346,7 +347,7 @@ class Ui_MainWindow(QMainWindow):
         def return_api_result(self):
             return self.api_result
     
-    def setupUi(self, MainWindow, selected_language, signed_user):
+    def setupUi(self, MainWindow, selected_language, signed_user, app_settings):
         print()
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1300, 863)
@@ -354,11 +355,29 @@ class Ui_MainWindow(QMainWindow):
         self.centralwidget = QtWidgets.QWidget(parent = MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
+
         ''' '''
         self.selected_language = selected_language
         self.signed_user = signed_user
-        print(f"From main_form.py class lang: {self.selected_language}, user: {self.signed_user} !!!")
+        self.app_settings = app_settings
+        
+        # apply settings
 
+        #  font name, font size
+        font = QFont(self.app_settings["font_name"],
+                     self.app_settings["font_size"])
+        self.MainWindow.setFont(font)
+
+        palette = QPalette()
+        # font color
+        palette.setColor(QPalette.ColorRole.WindowText,
+                         QColor(*self.app_settings["font_color"]))
+        # background color
+        palette.setColor(QPalette.ColorRole.Window, 
+                         QColor(*self.app_settings["background_color"]))
+        self.MainWindow.setPalette(palette)
+        
+        
         ''' table table - prikazuje joinanu tablicu skladista i proizvodi po ID-u - lijeva tablica na GUIu '''
         self.table_proizvodi = QtWidgets.QTableWidget(parent = self.centralwidget)
         self.table_proizvodi.setGeometry(QtCore.QRect(30, 410, 691, 201))
@@ -866,19 +885,26 @@ class Ui_MainWindow(QMainWindow):
     def open_rest_client(self):
         self.main_window = QtWidgets.QMainWindow()
         self.soap_client = Ui_rest_client()
-        self.soap_client.setupUi(self.main_window, self.signed_user, self.selected_language)
+        self.soap_client.setupUi(self.main_window,
+                                 self.signed_user, 
+                                 self.selected_language,
+                                 self.app_settings)
         self.main_window.show()
     
     def open_soap_client(self):
         self.main_window = QtWidgets.QMainWindow()
         self.soap_client = Ui_soap_client()
-        self.soap_client.setupUi(self.main_window, self.selected_language)
+        self.soap_client.setupUi(self.main_window,
+                                 self.selected_language,
+                                 self.app_settings)
         self.main_window.show()
         
     def open_http_client(self):
         self.main_window = QtWidgets.QMainWindow()
         self.http_client = Ui_download_client()
-        self.http_client.setupUi(self.main_window, self.selected_language)
+        self.http_client.setupUi(self.main_window,
+                                 self.selected_language,
+                                 self.app_settings)
         self.main_window.show()
 
     # function that is called when button_convert_currencies is clicked
@@ -965,7 +991,11 @@ class Ui_MainWindow(QMainWindow):
         
         self.product_data, self.master_detail_data = self.report_generator_data.return_data(self)
         
-        self.show_report.setupUi(self.main_window, self.product_data, self.master_detail_data, self.selected_language)
+        self.show_report.setupUi(self.main_window,
+                                 self.product_data,
+                                 self.master_detail_data,
+                                 self.selected_language,
+                                 self.app_settings)
         self.main_window.show()
     
     def save_picture_to_database(self):
@@ -982,7 +1012,8 @@ class Ui_MainWindow(QMainWindow):
         self.show_image_form = Ui_Form()
         self.show_image_form.setupUi(self.main_window,
                                      self.temp_blob_variable,
-                                     self.selected_language)
+                                     self.selected_language,
+                                     self.app_settings)
         self.main_window.show()
     
     def load_picture(self):

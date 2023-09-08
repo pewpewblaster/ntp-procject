@@ -8,6 +8,7 @@
 
 from PyQt6 import QtCore, QtWidgets
 from PyQt6.QtWidgets import QMessageBox
+from PyQt6.QtGui import QFont, QPalette, QColor
 import requests
 import multiprocessing
 
@@ -42,11 +43,30 @@ class Ui_soap_client(object):
         def return_request_data(self):
             return self.response.text, self.response_status_code
             
-    def setupUi(self, soap_client, language):
+    def setupUi(self,
+                soap_client,
+                language,
+                app_settings):
         soap_client.setObjectName("soap_client")
         soap_client.setFixedSize(707, 377)
+        self.soap_client = soap_client
         
         self.selected_language = language
+        self.app_settings = app_settings
+        
+        """Application settings"""
+        font = QFont(self.app_settings["font_name"],
+                     self.app_settings["font_size"])
+        self.soap_client.setFont(font)
+
+        palette = QPalette()
+        # font color
+        palette.setColor(QPalette.ColorRole.WindowText,
+                         QColor(*self.app_settings["font_color"]))
+        # background color
+        palette.setColor(QPalette.ColorRole.Window, 
+                         QColor(*self.app_settings["background_color"]))
+        self.soap_client.setPalette(palette)     
         
         self.list_country_codes = [
             "Croatia - HR",

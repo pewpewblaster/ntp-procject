@@ -7,17 +7,42 @@
 
 
 from PyQt6 import QtCore, QtWidgets
-from access_connector import create_new_user, user_database, delete_user_from_database, change_password
-from salt_pepper.password_hesher import generate_salt, generate_pepper, hash_password_sha256, verify_password
+from access_connector import (create_new_user,
+                              user_database, 
+                              delete_user_from_database, 
+                              change_password)
+from salt_pepper.password_hesher import hash_password_sha256
+from PyQt6.QtGui import QFont, QPalette, QColor
+
 ''' global variables'''
 
 ''' classes '''
 class Ui_Form(object):
-    def setupUi(self, Form, language):
+    def setupUi(self,
+                Form,
+                language,
+                app_settings):
+        
         Form.setObjectName("Form")
         Form.resize(619, 406)
         self.Form = Form
         self.selected_language = language
+        self.app_settings = app_settings
+        
+        
+        """Application settings"""
+        font = QFont(self.app_settings["font_name"],
+                     self.app_settings["font_size"])
+        self.Form.setFont(font)
+
+        palette = QPalette()
+        # font color
+        palette.setColor(QPalette.ColorRole.WindowText,
+                         QColor(*self.app_settings["font_color"]))
+        # background color
+        palette.setColor(QPalette.ColorRole.Window, 
+                         QColor(*self.app_settings["background_color"]))
+        self.Form.setPalette(palette) 
         
         # group box create user
         self.group_box_create_user = QtWidgets.QGroupBox(parent=Form)

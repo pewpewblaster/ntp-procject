@@ -17,11 +17,12 @@ supported_languages = ["French",
 
 ''' classes '''
 class login_form(object):
-    def login_ui(self, Form):
+    def login_ui(self, Form, app_settings):
         self.Form = Form
         Form.setObjectName("Form")
         
         self.selected_language = None
+        self.app_settings = app_settings
         
         # login button
         self.login_button = QtWidgets.QPushButton(parent=Form)
@@ -85,12 +86,6 @@ class login_form(object):
         self.push_button_new_user.setGeometry(QtCore.QRect(20, 240, 191, 24))
         self.push_button_new_user.setObjectName("push_button_new_user")
         self.push_button_new_user.clicked.connect(self.open_create_user_form)
-
-        # open settings
-        self.push_button_settings = QtWidgets.QPushButton(parent=Form)
-        self.push_button_settings.setGeometry(QtCore.QRect(20, 280, 191, 24))
-        self.push_button_settings.setObjectName("push_button_new_user")
-        self.push_button_settings.clicked.connect(self.open_settings)
  
         self.language_select(Form, self.comboBox.currentText(), False)
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -109,11 +104,10 @@ class login_form(object):
     def open_create_user_form(self):
         self.main_window = QtWidgets.QMainWindow()
         self.create_user = Ui_Form()
-        self.create_user.setupUi(self.main_window, self.selected_language)
+        self.create_user.setupUi(self.main_window,
+                                 self.selected_language,
+                                 self.app_settings)
         self.main_window.show()
-      
-    def open_settings(self):
-        pass 
     
     def login(self):
         
@@ -134,7 +128,10 @@ class login_form(object):
                 
                 self.main_window = QtWidgets.QMainWindow()
                 self.ui = Ui_MainWindow()
-                self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
+                self.ui.setupUi(self.main_window, 
+                                self.comboBox.currentText(), 
+                                self.edit_username.text(),
+                                self.app_settings)
                 self.main_window.show()
                 self.Form.close()
 
@@ -144,7 +141,10 @@ class login_form(object):
                 
                 self.main_window = QtWidgets.QMainWindow()
                 self.ui = Ui_MainWindow()
-                self.ui.setupUi(self.main_window, self.comboBox.currentText(), self.edit_username.text())
+                self.ui.setupUi(self.main_window, 
+                                self.comboBox.currentText(), 
+                                self.edit_username.text(),
+                                self.app_settings)
                 self.main_window.show()
                 self.Form.close()
         else:
@@ -168,7 +168,6 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Entrez votre nom d'utilisateur et votre mot de passe"))
             self.label_language.setText(_translate("Form", "Sélectionnez votre langue:"))
             self.push_button_new_user.setText(_translate("Form", "Gestion des utilisateurs"))
-            self.push_button_settings.setText(_translate("Form", "Paramètres"))
 
         if self.selected_language == "Croatian":
             _translate = QtCore.QCoreApplication.translate
@@ -180,7 +179,6 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Unesite korisničko ime i lozinku"))
             self.label_language.setText(_translate("Form", "Odaberite jezik:"))
             self.push_button_new_user.setText(_translate("Form", "Upravljanje korisnicima"))
-            self.push_button_settings.setText(_translate("Form", "Postavke"))
             
         if self.selected_language == "English":
             _translate = QtCore.QCoreApplication.translate
@@ -192,7 +190,6 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Enter your username and password"))
             self.label_language.setText(_translate("Form", "Select your language:"))
             self.push_button_new_user.setText(_translate("Form", "User Management"))
-            self.push_button_settings.setText(_translate("Form", "Settings"))
 
 
         if self.selected_language == "German":
@@ -205,7 +202,6 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Geben Sie Ihren Benutzernamen und Ihr Passwort ein"))
             self.label_language.setText(_translate("Form", "Wählen Sie Ihre Sprache:"))
             self.push_button_new_user.setText(_translate("Form", "Benutzerverwaltung"))
-            self.push_button_settings.setText(_translate("Form", "Einstellungen"))
 
         if self.selected_language == "Spanish":
             _translate = QtCore.QCoreApplication.translate
@@ -217,4 +213,3 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Ingrese su nombre de usuario y contraseña"))
             self.label_language.setText(_translate("Form", "Seleccione su idioma:"))
             self.push_button_new_user.setText(_translate("Form", "Gestión de usuarios"))
-            self.push_button_settings.setText(_translate("Form", "Configuración"))

@@ -9,6 +9,8 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 import requests, json
 from SQLite.sqlite3dll_handler_class import JwtDatabaseManager
+from PyQt6.QtGui import QFont, QPalette, QColor
+
 
 class Ui_rest_client(object):
     
@@ -75,18 +77,41 @@ class Ui_rest_client(object):
             except requests.exceptions.ConnectionError:
                 print("Connection to the REST server failed.")
                 
-    def setupUi(self, rest_client, username, language):
+    def setupUi(self,
+                rest_client,
+                username,
+                language,
+                app_settings):
+
         rest_client.setObjectName("rest_client")
         rest_client.setFixedSize(669, 442)
+        self.rest_client = rest_client
         
         self.logged_user = username
         self.selected_language = language
+        self.app_settings = app_settings
+        
+        
+        """Application settings"""
+        font = QFont(self.app_settings["font_name"],
+                     self.app_settings["font_size"])
+        self.rest_client.setFont(font)
+
+        palette = QPalette()
+        # font color
+        palette.setColor(QPalette.ColorRole.WindowText,
+                         QColor(*self.app_settings["font_color"]))
+        # background color
+        palette.setColor(QPalette.ColorRole.Window, 
+                         QColor(*self.app_settings["background_color"]))
+        self.rest_client.setPalette(palette)  
         
         self.textBrowser = QtWidgets.QTextBrowser(parent=rest_client)
         self.textBrowser.setGeometry(QtCore.QRect(20, 20, 331, 401))
         self.textBrowser.setObjectName("textBrowser")
         
-        """ Groupbox logistic partners"""
+        
+        """ Groupbox logistic partners """
         self.groupBox_logistic_partners = QtWidgets.QGroupBox(parent=rest_client)
         self.groupBox_logistic_partners.setGeometry(QtCore.QRect(370, 20, 281, 261))
         self.groupBox_logistic_partners.setObjectName("groupBox_logistic_partners")
