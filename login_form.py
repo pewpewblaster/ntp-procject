@@ -23,7 +23,7 @@ class login_form(object):
         
         self.selected_language = None
         self.app_settings = app_settings
-        
+                
         # login button
         self.login_button = QtWidgets.QPushButton(parent=Form)
         self.login_button.setGeometry(QtCore.QRect(20, 160, 91, 21))
@@ -126,6 +126,8 @@ class login_form(object):
                 sqlite_handler = JwtDatabaseManager()
                 sqlite_handler.update_or_insert_jwt(self.edit_username.text(), jtw_token)
                 
+                del sqlite_handler
+                
                 self.main_window = QtWidgets.QMainWindow()
                 self.ui = Ui_MainWindow()
                 self.ui.setupUi(self.main_window, 
@@ -148,7 +150,9 @@ class login_form(object):
                 self.main_window.show()
                 self.Form.close()
         else:
-            QtWidgets.QMessageBox.warning(self.Form, "Login Failed", "Invalid username or password.")
+            QtWidgets.QMessageBox.warning(self.Form, 
+                                          self.login_warning_title, 
+                                          self.login_warning_message)
     
     # localization
     def language_select(self, Form, language, from_winreg):
@@ -168,7 +172,9 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Entrez votre nom d'utilisateur et votre mot de passe"))
             self.label_language.setText(_translate("Form", "Sélectionnez votre langue:"))
             self.push_button_new_user.setText(_translate("Form", "Gestion des utilisateurs"))
-
+            self.login_warning_title = "Erreur"
+            self.login_warning_message = "Informations de connexion incorrectes"
+            
         if self.selected_language == "Croatian":
             _translate = QtCore.QCoreApplication.translate
             Form.setWindowTitle(_translate("Form", "Obrazac za prijavu"))
@@ -179,6 +185,8 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Unesite korisničko ime i lozinku"))
             self.label_language.setText(_translate("Form", "Odaberite jezik:"))
             self.push_button_new_user.setText(_translate("Form", "Upravljanje korisnicima"))
+            self.login_warning_title = "Greška"
+            self.login_warning_message = "Pogrešni podaci za prijavu"
             
         if self.selected_language == "English":
             _translate = QtCore.QCoreApplication.translate
@@ -190,7 +198,8 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Enter your username and password"))
             self.label_language.setText(_translate("Form", "Select your language:"))
             self.push_button_new_user.setText(_translate("Form", "User Management"))
-
+            self.login_warning_title = "Error"
+            self.login_warning_message = "Incorrect login credentials"
 
         if self.selected_language == "German":
             _translate = QtCore.QCoreApplication.translate
@@ -202,7 +211,9 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Geben Sie Ihren Benutzernamen und Ihr Passwort ein"))
             self.label_language.setText(_translate("Form", "Wählen Sie Ihre Sprache:"))
             self.push_button_new_user.setText(_translate("Form", "Benutzerverwaltung"))
-
+            self.login_warning_title = "Fehler"
+            self.login_warning_message = "Falsche Anmeldeinformationen"
+    
         if self.selected_language == "Spanish":
             _translate = QtCore.QCoreApplication.translate
             Form.setWindowTitle(_translate("Form", "Formulario"))
@@ -213,3 +224,6 @@ class login_form(object):
             self.label_information.setText(_translate("Form", "Ingrese su nombre de usuario y contraseña"))
             self.label_language.setText(_translate("Form", "Seleccione su idioma:"))
             self.push_button_new_user.setText(_translate("Form", "Gestión de usuarios"))
+            self.login_warning_title = "Error"
+            self.login_warning_message = "Credenciales de inicio de sesión incorrectas"
+

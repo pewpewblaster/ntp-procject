@@ -157,11 +157,11 @@ class Ui_soap_client(object):
             self.textBrowser_soap_message.append(self.soap_message)
             self.textBrowser_soap_message.append("\n\n")
         
-            success_message = f"JOB finished - exited with code {str(self.process_B_exit_code)}"
-            self.show_popup_message("Success", success_message)
+            self.show_popup_message(self.success_title,
+                                    self.success_message + str(self.process_B_exit_code))
         else:
-            error_message = f"JOB failed - exited with code {str(self.process_B_exit_code)}"
-            self.show_popup_message("Error", error_message)
+            self.show_popup_message(self.error_title,
+                                    self.error_message + str(self.process_B_exit_code))
 
     def show_popup_message(self, title, message):
         msg_box = QMessageBox()
@@ -180,6 +180,10 @@ class Ui_soap_client(object):
             self.label_request_code.setText(_translate("soap_client", "Status code:"))
             self.label_show_request_code.setText(_translate("soap_client", "None"))
             self.label.setText(_translate("soap_client", "SOAP message:"))
+            self.success_message = "JOB finished - exited with code: "
+            self.error_message = "JOB failed - exited with code"
+            self.error_title = "Error"
+            self.success_title = "Success"
             
         if self.selected_language == "Croatian":
             _translate = QtCore.QCoreApplication.translate
@@ -190,6 +194,10 @@ class Ui_soap_client(object):
             self.label_request_code.setText(_translate("soap_client", "Statusna šifra:"))
             self.label_show_request_code.setText(_translate("soap_client", "Nema"))
             self.label.setText(_translate("soap_client", "SOAP poruka:"))
+            self.success_message = "ZADATAK završen - izlaz s kodom: "
+            self.error_message = "ZADATAK nije uspio - izlaz s kodom"
+            self.error_title = "Greška"
+            self.success_title = "Uspjeh"
 
         if self.selected_language == "German":
             _translate = QtCore.QCoreApplication.translate
@@ -200,6 +208,10 @@ class Ui_soap_client(object):
             self.label_request_code.setText(_translate("soap_client", "Statuscode:"))
             self.label_show_request_code.setText(_translate("soap_client", "Keine"))
             self.label.setText(_translate("soap_client", "SOAP-Nachricht:"))
+            self.success_message = "AUFGABE abgeschlossen - beendet mit Code: "
+            self.error_message = "AUFGABE fehlgeschlagen - beendet mit Code"
+            self.error_title = "Fehler"
+            self.success_title = "Erfolg"
 
 
         if self.selected_language == "Spanish":
@@ -211,6 +223,10 @@ class Ui_soap_client(object):
             self.label_request_code.setText(_translate("soap_client", "Código de estado:"))
             self.label_show_request_code.setText(_translate("soap_client", "Ninguno"))
             self.label.setText(_translate("soap_client", "Mensaje SOAP:"))
+            self.success_message = "TRABAJO terminado - salió con código: "
+            self.error_message = "TRABAJO fallido - salió con código"
+            self.error_title = "Error"
+            self.success_title = "Éxito"
 
 
         if self.selected_language == "French":
@@ -222,4 +238,8 @@ class Ui_soap_client(object):
             self.label_request_code.setText(_translate("soap_client", "Code de statut :"))
             self.label_show_request_code.setText(_translate("soap_client", "Aucun"))
             self.label.setText(_translate("soap_client", "Message SOAP :"))
+            self.success_message = "TRAVAIL terminé - sorti avec le code : "
+            self.error_message = "TRAVAIL échoué - sorti avec le code"
+            self.error_title = "Erreur"
+            self.success_title = "Succès"
       

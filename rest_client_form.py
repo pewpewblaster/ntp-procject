@@ -10,6 +10,16 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 import requests, json
 from SQLite.sqlite3dll_handler_class import JwtDatabaseManager
 from PyQt6.QtGui import QFont, QPalette, QColor
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives import hashes
+import os
+import base64
+from Cryptodome.Hash import SHA256
+from Cryptodome.Signature import pkcs1_15
+from Cryptodome.PublicKey import RSA
+import hashlib
 
 
 class Ui_rest_client(object):
@@ -21,7 +31,36 @@ class Ui_rest_client(object):
            self.endpoint_protected = "api/protected"
            # POST and GET
            self.endpoint_logistic_partners = "api/logistic_partners"
-        
+           
+        def verify_signature(self, data, signature):
+            
+            my_dir = os.path.dirname(__file__)
+            public_key_path = os.path.join(my_dir, 'key/private_key.pem')
+            
+            
+            try:
+                # Load the server's public key from the specified path
+                with open(public_key_path, 'rb') as key_file:
+                    public_key = serialization.load_pem_public_key(
+                        key_file.read(),
+                        backend=default_backend()
+                    )
+
+                # Verify the signature
+                public_key.verify(
+                    signature,
+                    data.encode('utf-8'),
+                    padding.PSS(
+                        mgf=padding.MGF1(hashes.SHA256()),
+                        salt_length=padding.PSS.MAX_LENGTH
+                    ),
+                    hashes.SHA256()
+                )
+                return True
+            except Exception as e:
+                print(f"Signature verification failed: {e}")
+                return False
+            
         def get_protected_request(self, username):
             try:
                 jwt_database = JwtDatabaseManager()
@@ -39,6 +78,8 @@ class Ui_rest_client(object):
                     return None
             except requests.exceptions.ConnectionError:
                 print("Connection to the REST server failed.")
+
+                
         def get_endpoint_logistic_partners(self, username):
             try:
                 jwt_database = JwtDatabaseManager()
@@ -56,7 +97,7 @@ class Ui_rest_client(object):
                     return None
             except requests.exceptions.ConnectionError:
                 print("Connection to the REST server failed.")
-        
+                
         def post_endpoint_logistic_partners(self, username, json_data):
             try:
                 jwt_database = JwtDatabaseManager()

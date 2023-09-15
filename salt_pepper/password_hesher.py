@@ -4,6 +4,7 @@ from hmac import compare_digest
 import json
 import random
 import os
+from salt_pepper.rsa_fernet import encrypt_json, decrypt_json
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -28,8 +29,20 @@ json_file_path = os.path.join(script_directory, peppers_file)
 #     except FileNotFoundError:
 #         return None
 
-def generate_salt():
-    return token_urlsafe(20)
+def generate_salt(user_password):
+    # stari nacin generiranja soli
+    # return token_urlsafe(20)
+    
+    salt = ""
+    list_ascii_chars = [ord(char) for char in user_password]
+    
+    for ascii_char in list_ascii_chars:
+        salt += (chr(ascii_char + (len(salt) + 1)))
+    
+    salt = salt[::-1]
+    
+    return salt
+    
 
 def generate_pepper():
 
@@ -37,38 +50,49 @@ def generate_pepper():
     json_filename = "pepper.json"
     json_path = os.path.join(script_directory, json_filename)
 
+    decrypt_json()
+    
     with open(json_path, "r") as json_file:
         peppers = json.load(json_file)
+    encrypt_json()
     
     pepper = random.choice(peppers["peppers"])
     return pepper
 
 def hash_password_sha256(input_password):
-    salt = generate_salt()
+    salt = generate_salt(input_password)
     pepper = generate_pepper()
-    print(pepper)
+    
+    md5_salt = hashlib.md5()
+    md5_salt.update(salt.encode('utf-8'))
+    
     password_hasher = hashlib.sha256()
-    password_hasher.update((input_password + salt + pepper).encode('utf-8'))
+    password_hasher.update((input_password + md5_salt.hexdigest() + pepper).encode('utf-8'))
     hashed_password = password_hasher.hexdigest()
 
-    password = f"{salt}${hashed_password}"
-    return password
+    return hashed_password
 
 
-def verify_password(password_database, input_password):
-    password = password_database
-    salt, hashed_password = password.split("$")
+def verify_password(hashed_password, input_password):
 
+    salt = generate_salt(input_password)
+    
+    md5_salt = hashlib.md5()
+    md5_salt.update(salt.encode('utf-8'))
+    
+    
+    decrypt_json()
+    
     with open(json_file_path, "r") as json_file:
         data = json.load(json_file)
-    
-    peppers_array = data["peppers"]
+    peppers_list = data["peppers"]
+    encrypt_json()
 
-    for pepper in peppers_array:
+    for pepper in peppers_list:
         print(f"pepper: {pepper}")
 
         password_hasher = hashlib.sha256()
-        password_hasher.update((input_password + salt + pepper).encode('utf-8'))
+        password_hasher.update((input_password + md5_salt.hexdigest() + pepper).encode('utf-8'))
         check_hashed_password = password_hasher.hexdigest()
         
         if not compare_digest(hashed_password, check_hashed_password):

@@ -170,6 +170,9 @@ def check_credentials(username, input_password):
     query.close()
     database_users.close()
     
+    if not query_password:
+        return False
+    
     password_to_verify = query_password[0][0]
 
     if verify_password(password_to_verify, input_password) == True:

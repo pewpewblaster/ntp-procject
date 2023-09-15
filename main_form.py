@@ -7,7 +7,7 @@
 
 # imports for GUI from pyqt6
 from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtCore import Qt, QThread, pyqtSignal, QTimer
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtGui import QFont, QPalette, QColor
 # database manipulation imports
@@ -41,7 +41,7 @@ from PIL import Image # for image handling in function "def get_image_data(self)
 # imports for multithreading
 import time
 import concurrent.futures
-import threading
+import queue
 # imports for API REST requests - class getAPIRequest
 import freecurrencyapi
 
@@ -310,8 +310,8 @@ class Ui_MainWindow(QMainWindow):
         
         def __init__(self, custom_function):
             super().__init__()
-            self.custom_function = custom_function      
-        
+            self.custom_function = custom_function
+                
         def run(self):
             while True:
                 if self.total_cost_refesh_timer == 0:
@@ -321,7 +321,7 @@ class Ui_MainWindow(QMainWindow):
                     if self.custom_function:
                         custom_result = self.custom_function()
                         self.update_signal_product_cost_sum.emit(str(custom_result))
-                        
+
                     self.total_cost_refesh_timer = 10
                 
                 current_time = time.strftime("%H:%M:%S")
@@ -866,12 +866,13 @@ class Ui_MainWindow(QMainWindow):
 
         """ Auto update elemens of the GUI """
         self.refresh_thread = Ui_MainWindow.UIComponentRefresh(get_product_sum)
-        self.refresh_thread.update_signal_time.connect(self.update_time_label)
-        self.refresh_thread.update_singal_date.connect(self.update_date_label)
-        self.refresh_thread.update_singal_refresh_time.connect(self.update_refresh_time_label)
-        self.refresh_thread.update_signal_product_cost_sum.connect(self.update_custom_label)
+        self.refresh_thread.update_signal_time.connect(self.update_time_label, Qt.ConnectionType.QueuedConnection)
+        self.refresh_thread.update_singal_date.connect(self.update_date_label, Qt.ConnectionType.QueuedConnection)
+        self.refresh_thread.update_singal_refresh_time.connect(self.update_refresh_time_label, Qt.ConnectionType.QueuedConnection)
+        self.refresh_thread.update_signal_product_cost_sum.connect(self.update_custom_label, Qt.ConnectionType.QueuedConnection)
         self.refresh_thread.start()
         
+    
         # postavlja otvorene tabove na add warehouse, and add product
         self.tab_warehouse.setCurrentIndex(0)
         self.tab_products.setCurrentIndex(0)
@@ -975,8 +976,8 @@ class Ui_MainWindow(QMainWindow):
         self.threadpool.shutdown()
         
         QtWidgets.QMessageBox.information(self.MainWindow,
-                                "Reports generated successfully",
-                                "Reports are saved inside folder 'reprots'.")
+                                self.reports_generated_title,
+                                self.reports_generated_message)
         
     # function related to button self.button_show_reports
     # on click calls widget report_form.py that shows databse reports
@@ -1005,7 +1006,9 @@ class Ui_MainWindow(QMainWindow):
     def show_picture(self):
         self.temp_blob_variable = get_image(self.edit_show_picture_id.text())
         if self.temp_blob_variable == None:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", f"No image found for product ID: {self.edit_show_picture_id.text()}")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.error_title,
+                                          self.no_immage_found_message + self.edit_show_picture_id.text())
             return
 
         self.main_window = QtWidgets.QMainWindow()
@@ -1121,7 +1124,9 @@ class Ui_MainWindow(QMainWindow):
         warehouse_id = self.line_edit_select_warehouse.text()
         
         if not warehouse_id:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "You need to enter warehouse id!")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.error_title,
+                                          self.enter_werhouse_id_message)
             return
         
         warehouse_id = int(warehouse_id)
@@ -1132,7 +1137,9 @@ class Ui_MainWindow(QMainWindow):
         self.table_proizvodi_array, self.header, list_of_skladiste_id = get_table(warehouse_id)
 
         if warehouse_id not in list_of_skladiste_id:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Not warehouse is not in database")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.error_title,
+                                          self.no_warehouse_message)
             print("Ne postji skladiste sa indexom {}".format(warehouse_id))
         else:
             
@@ -1154,7 +1161,9 @@ class Ui_MainWindow(QMainWindow):
                     self.table_proizvodi.setItem(x, y, value)
             
             if not self.table_proizvodi_array:
-                QtWidgets.QMessageBox.warning(self.MainWindow, "Error", f"Warehouse by id: {warehouse_id} has no products!")
+                QtWidgets.QMessageBox.warning(self.MainWindow,
+                                              self.error_title, 
+                                              self.no_warehouse_message  + warehouse_id)
         
     def table_show_data_filter(self):
         product_filter = self.edit_find_warehouse_by_product.text()
@@ -1168,7 +1177,9 @@ class Ui_MainWindow(QMainWindow):
         self.header = self.table_filter_header
         
         if has_result == False:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Not found in database")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.error_title,
+                                          self.not_found_in_database)
         else:
             number_of_rows = len(self.table_filter_array)
             number_of_columns = len(self.table_filter_array[0]) if number_of_rows > 0 else 0
@@ -1204,9 +1215,13 @@ class Ui_MainWindow(QMainWindow):
                             self.line_edit_products_price_edit.text(),
                             self.line_edit_products_quantity_edit.text(),
                             self.line_edit_products_category_edit.text()) == True:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Success", "Product updated!")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.success_title,
+                                          self.product_updated)
         else:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Product do not exist in database!")
+            QtWidgets.QMessageBox.warning(self.MainWindow, 
+                                          self.error_title,
+                                          self.no_product_in_database)
 
     def change_warehouse_values(self):
         if update_warehouse(self.line_edit_warehoue_name_id_edit.text(),
@@ -1214,21 +1229,33 @@ class Ui_MainWindow(QMainWindow):
                             self.line_edit_warehoue_street_edit.text(),
                             self.line_edit_warehoue_city_edit.text(),
                             self.line_edit_warehoue_country_edit.text()) == True:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Success", "Warehouse updated!")
+            QtWidgets.QMessageBox.warning(self.MainWindow, 
+                                          self.success_title, 
+                                          self.warhouse_updated)
         else:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", "Warehouse do not exist in database!")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.error_title,
+                                          self.no_product_in_database)
     
     def delete_product(self):
         if delete_product_by_id(self.edit_delete_products.text()) == True:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Success", "Product deleted!")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.success_title,
+                                          self.product_deleted)
         else:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", f"Product with id: {self.edit_delete_products.text()} is not in database!")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.error_title,
+                                          self.no_product_by_id + self.edit_delete_products.text())
 
     def delete_warehouse(self):
         if delete_warehouse_by_id(self.edit_delete_warehouse.text()) == True:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Success", "Product deleted!")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.success_title,
+                                          self.warehouse_deleted)
         else:
-            QtWidgets.QMessageBox.warning(self.MainWindow, "Error", f"Product with id: {self.edit_delete_warehouse.text()} is not in database!")
+            QtWidgets.QMessageBox.warning(self.MainWindow,
+                                          self.error_title,
+                                          self.warehouse_by_id + self.edit_delete_warehouse.text())
     
     
     def show_warehouses(self):
@@ -1351,6 +1378,22 @@ class Ui_MainWindow(QMainWindow):
             self.button_http_client.setText(_translate("MainWindow", "Show HTTP client"))
             self.button_soap_client.setText(_translate("MainWindow", "Show SOAP client"))
             self.button_rest_client.setText(_translate("MainWindow", "REST client"))
+            self.reports_generated_title = "Reports generated successfully"
+            self.reports_generated_message = "Reports are saved inside folder 'reprots'."
+            self.error_title = "Error"
+            self.success_title = "Success"
+            self.no_immage_found_message = "No image found for product ID: "
+            self.enter_werhouse_id_message = "You need to enter warehouse id!"
+            self.no_warehouse_message = "Warehouse has no products, by id: "
+            self.error_title = "Error"
+            self.not_found_in_database = "Not found in database"
+            self.product_updated = "Product updated!"
+            self.no_product_in_database = "Product do not exist in database!"
+            self.warhouse_updated = "Warehouse updated!"
+            self.product_deleted = "Product deleted!"
+            self.no_product_by_id = "No product in database by id:"
+            self.warehouse_deleted = "Warehouse deleted"
+            self.warehouse_by_id = "No warehouse in database by id: "
         
         if self.selected_language == "Croatian":
             _translate = QtCore.QCoreApplication.translate
@@ -1439,6 +1482,22 @@ class Ui_MainWindow(QMainWindow):
             self.button_http_client.setText(_translate("MainWindow", "Prikaži HTTP klijenta"))
             self.button_soap_client.setText(_translate("MainWindow", "Prikaži SOAP klijenta"))
             self.button_rest_client.setText(_translate("MainWindow", "Prikaži REST klijenta"))
+            self.reports_generated_title = "Izvještaji uspješno generirani"
+            self.reports_generated_message = "Izvještaji su spremljeni unutar mape 'izvještaji'."
+            self.error_title = "Greška"
+            self.success_title = "Uspjeh"
+            self.no_immage_found_message = "Nema slike za ID proizvoda: "
+            self.enter_werhouse_id_message = "Morate unijeti ID skladišta!"
+            self.no_warehouse_message = "Skladište nema proizvoda, po ID-u: "
+            self.error_title = "Greška"
+            self.not_found_in_database = "Nije pronađeno u bazi podataka"
+            self.product_updated = "Proizvod ažuriran!"
+            self.no_product_in_database = "Proizvod ne postoji u bazi podataka!"
+            self.warhouse_updated = "Skladište ažurirano!"
+            self.product_deleted = "Proizvod izbrisan!"
+            self.no_product_by_id = "Nema proizvoda u bazi podataka po ID-u:"
+            self.warehouse_deleted = "Skladište izbrisano"
+            self.warehouse_by_id = "Nema skladišta u bazi podataka po ID-u: "
             
         if self.selected_language == "German":
             _translate = QtCore.QCoreApplication.translate
@@ -1527,6 +1586,23 @@ class Ui_MainWindow(QMainWindow):
             self.button_http_client.setText(_translate("MainWindow", "HTTP-Client anzeigen"))
             self.button_soap_client.setText(_translate("MainWindow", "SOAP-Client anzeigen"))
             self.button_rest_client.setText(_translate("MainWindow", "REST-Client anzeigen"))
+            self.reports_generated_title = "Berichte erfolgreich generiert"
+            self.reports_generated_message = "Berichte wurden im Ordner 'Berichte' gespeichert."
+            self.error_title = "Fehler"
+            self.success_title = "Erfolg"
+            self.no_image_found_message = "Kein Bild für Produkt-ID gefunden: "
+            self.enter_warehouse_id_message = "Sie müssen die Lager-ID eingeben!"
+            self.no_warehouse_message = "Das Lager hat keine Produkte, nach ID: "
+            self.error_title = "Fehler"
+            self.not_found_in_database = "Nicht in der Datenbank gefunden"
+            self.product_updated = "Produkt aktualisiert!"
+            self.no_product_in_database = "Produkt existiert nicht in der Datenbank!"
+            self.warehouse_updated = "Lager aktualisiert!"
+            self.product_deleted = "Produkt gelöscht!"
+            self.no_product_by_id = "Kein Produkt in der Datenbank nach ID:"
+            self.warehouse_deleted = "Lager gelöscht"
+            self.warehouse_by_id = "Kein Lager in der Datenbank nach ID: "
+
 
         if self.selected_language == "Spanish":
             _translate = QtCore.QCoreApplication.translate
@@ -1615,6 +1691,23 @@ class Ui_MainWindow(QMainWindow):
             self.button_http_client.setText(_translate("MainWindow", "Mostrar cliente HTTP"))
             self.button_soap_client.setText(_translate("MainWindow", "Mostrar cliente SOAP"))
             self.button_rest_client.setText(_translate("MainWindow", "Mostrar cliente REST"))
+            self.reports_generated_title = "Informes generados exitosamente"
+            self.reports_generated_message = "Los informes se guardan en la carpeta 'informes'."
+            self.error_title = "Error"
+            self.success_title = "Éxito"
+            self.no_image_found_message = "No se encontró imagen para el ID del producto: "
+            self.enter_warehouse_id_message = "¡Debe ingresar el ID del almacén!"
+            self.no_warehouse_message = "El almacén no tiene productos, por ID: "
+            self.error_title = "Error"
+            self.not_found_in_database = "No encontrado en la base de datos"
+            self.product_updated = "¡Producto actualizado!"
+            self.no_product_in_database = "El producto no existe en la base de datos!"
+            self.warehouse_updated = "¡Almacén actualizado!"
+            self.product_deleted = "¡Producto eliminado!"
+            self.no_product_by_id = "No hay producto en la base de datos con ID:"
+            self.warehouse_deleted = "Almacén eliminado"
+            self.warehouse_by_id = "No hay almacén en la base de datos con ID: "
+
 
         if self.selected_language == "French":
             _translate = QtCore.QCoreApplication.translate
@@ -1703,3 +1796,20 @@ class Ui_MainWindow(QMainWindow):
             self.button_http_client.setText(_translate("MainWindow", "Afficher le client HTTP"))
             self.button_soap_client.setText(_translate("MainWindow", "Afficher le client SOAP"))
             self.button_rest_client.setText(_translate("MainWindow", "Afficher le client REST"))
+            self.reports_generated_title = "Rapports générés avec succès"
+            self.reports_generated_message = "Les rapports sont enregistrés dans le dossier 'rapports'."
+            self.error_title = "Erreur"
+            self.success_title = "Succès"
+            self.no_image_found_message = "Aucune image trouvée pour l'ID du produit : "
+            self.enter_warehouse_id_message = "Vous devez entrer l'ID de l'entrepôt !"
+            self.no_warehouse_message = "L'entrepôt n'a pas de produits, par ID : "
+            self.error_title = "Erreur"
+            self.not_found_in_database = "Non trouvé dans la base de données"
+            self.product_updated = "Produit mis à jour !"
+            self.no_product_in_database = "Le produit n'existe pas dans la base de données !"
+            self.warehouse_updated = "Entrepôt mis à jour !"
+            self.product_deleted = "Produit supprimé !"
+            self.no_product_by_id = "Aucun produit dans la base de données par ID :"
+            self.warehouse_deleted = "Entrepôt supprimé"
+            self.warehouse_by_id = "Aucun entrepôt dans la base de données par ID : "
+

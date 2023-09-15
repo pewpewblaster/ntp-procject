@@ -126,19 +126,24 @@ class Ui_Form(object):
         QtCore.QMetaObject.connectSlotsByName(Form)
 
     def password_change(self):
-        confirmation_message = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Question, "Warning!", "Are you sure you want to change the password?", QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No, self.Form)
+        confirmation_message = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Question,
+                                                     self.warning_title,
+                                                     self.password_change_message, 
+                                                     QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No, self.Form)
         confirmation_result = confirmation_message.exec()
         
         self.new_password = self.edit_password_change.text()
         self.new_password_heshed = hash_password_sha256(self.new_password)
         
-    
         if confirmation_result == QtWidgets.QMessageBox.StandardButton.Yes:
             if change_password(self.edit_username_change.text(), self.new_password_heshed):
-                QtWidgets.QMessageBox.warning(self.Form, "Success", "Password changed!")
+                QtWidgets.QMessageBox.warning(self.Form,
+                                              self.success_title, 
+                                              self.password_changed)
             else:
-                QtWidgets.QMessageBox.warning(self.Form, "Error", "Wrong username")
-            
+                QtWidgets.QMessageBox.warning(self.Form,
+                                              self.error_title,
+                                              self.wrong_username)
             
     def create_new_user(self):
         
@@ -146,9 +151,13 @@ class Ui_Form(object):
         self.new_password_heshed = hash_password_sha256(self.new_password)
         
         if create_new_user(self.line_edit_username.text(), self.new_password_heshed):
-            QtWidgets.QMessageBox.warning(self.Form, "Success", "User created.")
+            QtWidgets.QMessageBox.warning(self.Form,
+                                          self.success_title,
+                                          self.user_created)
         else:
-            QtWidgets.QMessageBox.warning(self.Form, "Error", "User already exists!")
+            QtWidgets.QMessageBox.warning(self.Form,
+                                          self.error_title,
+                                          self.user_exists)
 
     def show_users(self):
         self.array_of_users = user_database() 
@@ -167,16 +176,22 @@ class Ui_Form(object):
             self.table_created_users.setItem(x, 0, value)
 
     def delete_user(self):
-        confirmation_message = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Question, "Warning!", f"Are you sure you want to delete the user: {self.edit_delete_user.text()}?", QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No, self.Form)
+        confirmation_message = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Question,
+                                                     self.warning_title,
+                                                     self.delete_user_question + self.edit_delete_user.text() + " ?",
+                                                     QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No, self.Form)
         confirmation_result = confirmation_message.exec()
         
         if confirmation_result == QtWidgets.QMessageBox.StandardButton.Yes:
             if delete_user_from_database(self.edit_delete_user.text()):
-                QtWidgets.QMessageBox.warning(self.Form, "Success", "User deleted!")
+                QtWidgets.QMessageBox.warning(self.Form,
+                                              self.success_title,
+                                              self.user_deleted)
             else:
-                QtWidgets.QMessageBox.warning(self.Form, "Error", "User is not in database")
+                QtWidgets.QMessageBox.warning(self.Form,
+                                              self.error_title,
+                                              self.no_user_in_database)
             
-    
     def retranslateUi(self, Form):
         
         if self.selected_language == "English":
@@ -195,6 +210,17 @@ class Ui_Form(object):
             self.button_delete_user.setText(_translate("Form", "Delete user"))
             self.group_box_created_users.setTitle(_translate("Form", "Created users"))
             self.button_show_users.setText("Show users")
+            warning_title = "Warning!"
+            self.error_title = "Error"
+            self.success_title = "Success"
+            self.wrong_username = "Wrong username"
+            self.password_change_message = "Are you sure you want to change the password?"
+            self.password_changed = "Password changed!"
+            self.user_created = "User created."
+            self.user_exists = "User already exists!"
+            self.delete_user_question = "Are you sure you want to delete the user: "
+            self.user_deleted = "User deleted!"
+            self.no_user_in_database = "User is not in database"
             
         if self.selected_language == "French":
             _translate = QtCore.QCoreApplication.translate
@@ -212,6 +238,18 @@ class Ui_Form(object):
             self.button_delete_user.setText(_translate("Form", "Supprimer l'utilisateur"))
             self.group_box_created_users.setTitle(_translate("Form", "Utilisateurs créés"))
             self.button_show_users.setText("Afficher les utilisateurs")
+            self.warning_title = "Attention !"
+            self.error_title = "Erreur"
+            self.success_title = "Succès"
+            self.wrong_username = "Nom d'utilisateur incorrect"
+            self.password_change_message = "Êtes-vous sûr de vouloir changer le mot de passe ?"
+            self.password_changed = "Mot de passe changé !"
+            self.user_created = "Utilisateur créé."
+            self.user_exists = "L'utilisateur existe déjà !"
+            self.delete_user_question = "Êtes-vous sûr de vouloir supprimer l'utilisateur : "
+            self.user_deleted = "Utilisateur supprimé !"
+            self.no_user_in_database = "L'utilisateur n'est pas dans la base de données"
+
             
         if self.selected_language == "Croatian":
             _translate = QtCore.QCoreApplication.translate
@@ -229,6 +267,17 @@ class Ui_Form(object):
             self.button_delete_user.setText(_translate("Form", "Izbrišite korisnika"))
             self.group_box_created_users.setTitle(_translate("Form", "Stvoreni korisnici"))
             self.button_show_users.setText(_translate("Form", "Prikaži korisnike"))
+            self.warning_title = "Upozorenje!"
+            self.error_title = "Greška"
+            self.success_title = "Uspjeh"
+            self.wrong_username = "Pogrešno korisničko ime"
+            self.password_change_message = "Jeste li sigurni da želite promijeniti lozinku?"
+            self.password_changed = "Lozinka promijenjena!"
+            self.user_created = "Korisnik stvoren."
+            self.user_exists = "Korisnik već postoji!"
+            self.delete_user_question = "Jeste li sigurni da želite izbrisati korisnika: "
+            self.user_deleted = "Korisnik izbrisan!"
+            self.no_user_in_database = "Korisnik nije u bazi podataka"
 
         if self.selected_language == "German":
             _translate = QtCore.QCoreApplication.translate
@@ -246,6 +295,18 @@ class Ui_Form(object):
             self.button_delete_user.setText(_translate("Form", "Benutzer löschen"))
             self.group_box_created_users.setTitle(_translate("Form", "Erstellte Benutzer"))
             self.button_show_users.setText(_translate("Form", "Benutzer anzeigen"))
+            self.warning_title = "Warnung!"
+            self.error_title = "Fehler"
+            self.success_title = "Erfolg"
+            self.wrong_username = "Falscher Benutzername"
+            self.password_change_message = "Möchten Sie das Passwort wirklich ändern?"
+            self.password_changed = "Passwort geändert!"
+            self.user_created = "Benutzer erstellt."
+            self.user_exists = "Benutzer existiert bereits!"
+            self.delete_user_question = "Sind Sie sicher, dass Sie den Benutzer löschen möchten: "
+            self.user_deleted = "Benutzer gelöscht!"
+            self.no_user_in_database = "Benutzer ist nicht in der Datenbank"
+
 
         if self.selected_language == "Spanish":
             _translate = QtCore.QCoreApplication.translate
@@ -263,3 +324,15 @@ class Ui_Form(object):
             self.button_delete_user.setText(_translate("Form", "Eliminar usuario"))
             self.group_box_created_users.setTitle(_translate("Form", "Usuarios creados"))
             self.button_show_users.setText(_translate("Form", "Mostrar usuarios"))
+            self.warning_title = "¡Advertencia!"
+            self.error_title = "Error"
+            self.success_title = "Éxito"
+            self.wrong_username = "Nombre de usuario incorrecto"
+            self.password_change_message = "¿Estás seguro de que quieres cambiar la contraseña?"
+            self.password_changed = "Contraseña cambiada!"
+            self.user_created = "Usuario creado."
+            self.user_exists = "¡El usuario ya existe!"
+            self.delete_user_question = "¿Estás seguro de que quieres eliminar al usuario: "
+            self.user_deleted = "Usuario eliminado!"
+            self.no_user_in_database = "Usuario no está en la base de datos"
+
